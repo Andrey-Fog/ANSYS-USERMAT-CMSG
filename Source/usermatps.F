@@ -98,7 +98,7 @@ c
 
   
       ebulk3=E/(1.d0-2.d0*xnue)
-      xk=ebulk3/3.d0 !объемный модуль упругости
+      xk=ebulk3/3.d0 
       
       
 c     Rewrite  
@@ -344,9 +344,11 @@ c
         strainp(noel,9:12)=dpstran
        elseif (npt==4) then  
         strainp(noel,13:16)=dpstran      
-       end if
-       statev(1:4)=eelas                  !    Svar (1-4)
-       statev(5:8)=eplas                  !    Svar (5-8)
+      end if
+c     Svar (1-4)
+       statev(1:4)=eelas  
+c     Svar (5-8)
+       statev(5:8)=eplas                  
 c *** elastic strain and put into epsZZ
       epsZZ    = -xnue/E * (stress(1) + stress(2))
 c *** add plastic strain to total strain epsZZ
@@ -410,50 +412,10 @@ c
       
       return
       end
-       subroutine elasticstiffnes_ps(Ex, nu, mcomp, outmatrix)
-c *** subroutine return the elastic stiffnes matrix for plane stress
-c
-c *** Input arguments 
-c         Ex                          - Young's modulus
-c         nu                          - Poisson's ratio
-c         mcomp                       - array dimension     
-c                                       (4 - for plane strain, 6 - for full 3d)
-c *** Output arguments 
-c         outmatrix(mcomp,mcomp)      - Output stiffnes matrix
-c
-c ***     local variables
-c     eg2     (dp)        - Two shear modulus 
-c
-c ***     Additional variables      
-c     tmpelam    (dp)        
-c
-      INTEGER icomp, jcomp, mcomp
-      DOUBLE PRECISION 
-     &                 Ex, nu, eg2, tmpelam
-      DOUBLE PRECISION outmatrix(mcomp,mcomp)     
+ 
+      subroutine kdevia(strss,xidenty,devito)  
       
-c
-c***************** Body of the subroutine********************************   
-c
-          eg2=Ex/(1.d0+nu)
-          tmpelam=(Ex/(1.d0-2.d0*nu)-eg2)/3.d0            
-
-          outmatrix = 0
-          do icomp=1,2
-              do jcomp=1,2
-                  outmatrix(jcomp,icomp)=tmpelam
-              end do
-              outmatrix(icomp,icomp)=eg2+tmpelam
-          end do
-          do icomp=3, mcomp
-              outmatrix(icomp,icomp)=eg2/2.d0
-          end do      
-          return
-      end subroutine
-      subroutine kdevia(strss,xidenty,devito)
-     
 #include 'impcom.inc'
-
       DOUBLE PRECISION strss(3,3),xidenty(3,3),devito(3,3)
       DOUBLE PRECISION x
       INTEGER i,j
@@ -492,21 +454,20 @@ c
        x=x+eff1(i,j)*eff1(i,j)
 40    continue
 
-      if(x .le. 0.0) go to 50      
-      
+      if(x .le. 0.0) go to 50          
       val1=sqrt((2.0/3.0)*x)
 50    return
       end   
     
                   SUBROUTINE REVERSE(N,A,C)
-            ! input ...
-            ! a(n,n) - array of coefficients for matrix A
-            ! n      - dimension
-            ! output ...
-            ! c(n,n) - inverse matrix of A
-            ! comments ...
-            ! the original matrix a(n,n) will be destroyed 
-            ! during the calculation
+c     input ...
+c     a(n,n) - array of coefficients for matrix A
+c     n      - dimension
+c     output ...
+c     c(n,n) - inverse matrix of A
+c     comments ...
+c     the original matrix a(n,n) will be destroyed 
+c     during the calculation
             !===========================================================
             implicit none 
             integer n
@@ -550,7 +511,7 @@ c
                           end do
                       end do
                   end do   
-c          обратный ход
+c          change way
                   do i = -N,-1
                       tt = OOO(-i,-i)
                       do pp = 1, 2*N

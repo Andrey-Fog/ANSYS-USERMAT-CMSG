@@ -10,6 +10,11 @@
      &                   tsstif, epsZZ,
      &                   var1, var2, var3, var4, var5,
      &                   var6, var7, var8)
+c      
+c     Custom user material subroutine for Conventional Gradient Plasticity Model.      
+c     The procedure is created for SOLID186 element with Keyopt(2)=0.
+c     SOLID186 have a 8 integration points. 
+c     Coordinates of integration points in the coordinate system s-t-r = ± 0.577350269189626
 !DEC$ ATTRIBUTES DLLEXPORT, ALIAS:"USERMAT3D"::usermat3d 
       use kplastic
 c
@@ -33,16 +38,16 @@ c
      &                 dfgrd0 (3,3), dfgrd1 (3,3),
      &                 tsstif  (2)
 c
-      ! Integration Point Locations in local element CS
+c     Integration Point Locations in local element CS
       DOUBLE PRECISION  s, t, r
-      ! Not used variables
+c     Reserved by ANSYS variables
       DOUBLE PRECISION var0, var1, var2, var3, var4, var5,
      &                 var6, var7, var8
-      !state variables massive for all integration points
+c     state variables array for all integration points
       DOUBLE PRECISION SVAR(8,nstatv), SVARtmp(nstatv)
-      !значения производных функций формы в точках интегрирования
+c     derivatives of shape functions at integration points
       DOUBLE PRECISION deriv(3,8)
-      !вспомогательные параметры для производных
+c     auxiliary parameters for derivatives
       DOUBLE PRECISION P007, P057, P108
       PARAMETER       (P007       = 0.07216878364870325,
      &                 P057       = 0.577350269189626,
@@ -51,12 +56,10 @@ c
       DOUBLE PRECISION 
      1 ddsddt(ntens),drplde(ntens),
      2 predef(1),dpred(1),drot(3)
-    
-     
 
       parameter newton=1000, toler=1.0d-8
       DOUBLE PRECISION eelas(ntens),eplas(ntens)
-      !матрицы для нахождения якобиана функций формы
+c     matrices for finding the Jacobian
       DOUBLE PRECISION xjacm(3,3), xjaci(3,3)
       DOUBLE PRECISION a1, a2, a3, a4, a5, a6, a7, a8,
      &  b1, b2, b3, b4, b5, b6, b7, b8,
@@ -76,7 +79,7 @@ c
      1 rhs, dabs, deqpl, ep, q,  ene,
      2 xm ,b,gnd, ssd,td, sigi(ntens), sigElp(ntens)
       
-      !temp parameters 
+c     temp parameters 
       DOUBLE PRECISION elast1, elast2
       
       DOUBLE PRECISION HALF, THIRD, ONE, TWO, SMALL, ONEHALF,
@@ -95,12 +98,8 @@ c
      &                 )      
       
         DATA G/1.0D0,1.0D0,1.0D0,0.0D0,0.0D0,0.0D0/
-      !Процедура пользовательского материала для модели упрощенной градиентной пластичности
-      ! Процедура заточена под использование элемента SOLID186 при Keyopt(2)=0, что обуславливает
-      ! 8 точек интегрирования. Координаты точек интегрирования в системе координат s-t-r = ± 0.577350269189626
 
-      !
-      
+        
 c     input arguments
 c     ===============
 c      cmname     (int,sc,i)               material #
@@ -169,17 +168,18 @@ c           dsdePl    |  2211   2222   2233   2212   2223   2213 |
 c           dsdePl    |  3311   3322   3333   3312   3323   3313 |
 c           dsdePl    |  1211   1222   1233   1212   1223   1213 |
 c           dsdePl    |  2311   2322   2333   2312   2323   2313 |
-c           dsdePl    |  1311   1322   1333   1312   1323   1313 |      
-c      Структура пользовательского массива ustatev
-      ! 1-3 Координаты точки интегрирования
-      ! 4-9 компоненты градиента x,y,z,xy,yz,zx
-      ! 10  градиент
+c           dsdePl    |  1311   1322   1333   1312   1323   1313 |    
+c
+c     Structure of the ustatev() array
+c     1-3 Integration point coordinates in global system
+c     4-9 derivatives x,y,z,xy,yz,zx
+c     10  gradient
 
 c *** Obtaining plastic strains from previous iteration
       
       eplas =epsPl
       eqplas=epseq
-      !собираем значения градиентов и т.д. из всех точек интегрирования элемента
+c     obtain the gradient values from all integration points
       SVAR=0.d0
       do i=1,8
          call get_ElmData ('SVAR', noel,i, nstatv, SVARtmp)
@@ -187,43 +187,31 @@ c *** Obtaining plastic strains from previous iteration
               SVAR(i,j)=SVARtmp(j)
          enddo
       enddo
-      ! do i=1,8
-      !   call get_ElmData ('LOCI', noel,i, 3, drot)
-      !    do j=1,3
-      !        SVAR(i,j)=drot(j)
-      !   enddo
-      !enddo
-      !упругие деформации
+c     elastic strains
       eelas=stran  - eplas
-      
-       
-      !Считываем свойства материала
-      ! модуль Юнга
+c *** Material properties      
+c     Young modulus
       E=props(1)
-      ! коэффициент пуассона
+c     Poisson ratio
       xnue=props(2)
-      ! предел текучести
+c     Yeld stress
       syield=props(3)
-      ! характеристический параметр длины
+c     characteristic length
        ele=props(4)
-      ! показатель деформационного упрочнения (0 < ene < 1)
+c     strain hardening exponent (0 < ene < 1)
        ene=props(5)
-      ! флаг, определяющий выбор методов расчета статистически сохраняемх дислокаций
-      ! Для металлов в большинстве случаев ставим 1
+c     flag, statistically conserved dislocations. See Arsenlis and Parks (1998)
+c     in most cases is eq to 1
        kflag=props(6)
        
       ebulk3=E/(1.d0-2.d0*xnue)
-      !объемный модуль упругости
-      xk=ebulk3/3.d0  
-      
+c     Bulk modulus
+      xk=ebulk3/3.d0     
       eg2=E/(1.d0+xnue)
       eg=eg2/2.d0
-      
       elam=(ebulk3-eg2)/3.d0 
-      !elast1=E*xnue/((1.0D0+xnue)*(1.0D0-TWO*xnue))
-      !elast2=HALF*eg !!!!!!!!!!!!!!
+
 c *** calculate elastic stiffness matrix (3d)
-c
       ddsdde=0.d0   
        do k1=1,3
         do k2=1,3
@@ -238,12 +226,11 @@ c     it's needed for calculation of hourglass stiffness
       tsstif(1)=eg 
       
       if (all(dstran .eq. 0)) then 
-          ! если вектор приращений деформаций нулевой, то выходим из usermat 
            goto 100
           else
-          !вычисляем градиенты для всех точек интегрирования из первой
+c *** gradients for all integration points
               
-          !integration point coordinates in the isoparametric space              
+c     integration point coordinates in the isoparametric space              
           if (npt.eq.1) then   
              do k1=1,8  
                 if (k1==1) then
@@ -279,7 +266,7 @@ c     it's needed for calculation of hourglass stiffness
                     t=0.577350269189626
                     r=0.577350269189626
                 end if
-          !adopted linear shape functions     
+c     adopted linear shape functions     
          deriv(1,1)=-P007*(P057*r - 1)*(P057*t - 1)
          deriv(2,1)=-P057*(P057*r - 1)*(P007*s - P108)
          deriv(3,1)=-P057*(P057*t - 1)*(P007*s - P108)     
@@ -314,9 +301,9 @@ c     it's needed for calculation of hourglass stiffness
    
 
           
-          !Структура массиваа xjacm 
-          ! столбцы это глобальные координаты х у z
-          ! строки это s t r
+c     xjacm array structure
+c     columns are global x y z coordinates
+c     lines are s t r
          xjacm(1,1)= deriv(1,1)*SVAR(1,1)+deriv(1,2)*SVAR(2,1)
      1 +deriv(1,3)*SVAR(3,1)+deriv(1,4)*SVAR(4,1) 
      2 +deriv(1,5)*SVAR(5,1)+deriv(1,6)*SVAR(6,1) 
@@ -623,7 +610,7 @@ c     it's needed for calculation of hourglass stiffness
     
         
           enddo
-           !пропиcываем вычисленные градиенты в пользовательские массивы
+c     Save obtained gradients
           do k1=1,8
             do k2=1,nstatv
               SVARtmp(k2)=SVAR(k1,k2)
@@ -639,8 +626,7 @@ c     it's needed for calculation of hourglass stiffness
         xiden(i,i)=1.d0   
        enddo    
        stra=0.d0   
-       !заполняем матрицу деформаций
-       !и сразу преводим их в физические
+c     Phisical strains
        do i=1,3
         stra(i,i)=eelas(i)
        enddo
@@ -650,10 +636,10 @@ c     it's needed for calculation of hourglass stiffness
        stra(3,1)=eelas(6)/2.d0
        stra(2,3)=eelas(5)/2.d0
        stra(3,2)=eelas(5)/2.d0
-       !девиатор упругих деформаций
+c     deviatoric elastic strains 
        call kdevia(stra,xiden,strad)
        dstra=0.d0
-       !матрица приращений физических деформаций
+c     elastic strains increment
        do i=1,3
         dstra(i,i)=dstran(i)
        enddo
@@ -663,15 +649,14 @@ c     it's needed for calculation of hourglass stiffness
        dstra(3,1)=dstran(6)/2.d0
        dstra(3,2)=dstran(5)/2.d0
        dstra(2,3)=dstran(5)/2.d0
-       !девиатор приращений деформаций
+c     deviatoric elastic strains increment
        call kdevia(dstra,xiden,dstrad)
        strain=strad+dstrad
-       !эквивалентные деформации
+c     equivalent strain
        call keff(strain,def)
-       !эквивалентные приращения деформаций
+c     equivalent strain increment
        call keff(dstrad,defi)
-c *** Plastic
-       
+c *** Plastic      
 c     flow stress
       sigmaf=syield*((E/syield)**ene)*sqrt((epseq+(syield/E))**(2*ene)
      1 + ele*SVAR(npt,10))
@@ -687,46 +672,46 @@ c
 c       sigmae=0
 c       write(7,19) newton
 c   19 format(//,30x,'***warning - plasticity algorithm did not ',
-c     1 'converge after',i3, 'iterations')
+c     1 'converged after',i3, 'iterations')
  20    continue   
           
        deqpl=def-sigmae/(3.d0*eg)
        epseq=eqplas+deqpl
-!
+c
        dstr=strain*2.d0*eg/(1.d0+deqpl*3.d0*eg/sigmae)
-!
+c
        do i=1,3
         dstre(i)=dstr(i,i)
        enddo
        dstre(4)=dstr(1,2)
        dstre(5)=dstr(2,3)
        dstre(6)=dstr(3,1)
-!
+c
        dpstrn=dstr*(3.d0*deqpl)/(2.d0*sigmae)
-!
+c
        do i=1,3             
         dpstran(i)=dpstrn(i,i)
        enddo
        dpstran(4)=2.d0*dpstrn(1,2)
        dpstran(5)=2.d0*dpstrn(2,3)
        dpstran(6)=2.d0*dpstrn(3,1)
-!       
+c       
        destran=dstran-dpstran
        eplas=eplas+dpstran
        eelas=eelas+destran
        ep=eelas(1)+eelas(2)+eelas(3)
        stran=eelas+eplas
-!      
+c      
        do j=1,3
         stress(j)=dstre(j)+xk*ep
        enddo
        stress(4)=dstre(4)
        stress(5)=dstre(5)
        stress(6)=dstre(6)
-       
+c       
        statev(4:9)= dpstran
-        
-        q=(2.d0/3.d0)*(sigmae/def)
+c ***  material jacobian matrix  
+       q=(2.d0/3.d0)*(sigmae/def)
        r=((h-(deqpl/sigmae))/(def*sigmae))*(3.d0*eg)/(1.d0+3.d0*eg*h)
        ddsdde=0
        do i=1,3
@@ -749,19 +734,23 @@ c     1 'converge after',i3, 'iterations')
        ddsdde(4,4) = q/2.d0 - r*dstre(4)*dstre(4)
        ddsdde(5,5) = q/2.d0 - r*dstre(5)*dstre(5)
        ddsdde(6,6) = q/2.d0 - r*dstre(6)*dstre(6)
-      !записываем результат решения
-       epspl=eplas
+
        
-      ! output
+c *** OUTPUT
+c     plastic strains
+       epspl=eplas
        kflag=props(6)
-       if (kflag.eq.1) then ! fcc
-        xm=3.06d0
-        b=0.2555d-6
-        r=1.9 !arsenlis and parks (1998)
-       else ! bcc
-        xm=2.9d0
-        b=0.2725d-6
-        r=1.9 ! ?
+       if (kflag.eq.1) then
+c     fcc
+c     arsenlis and parks (1998)
+              xm=3.06d0
+              b=0.2555d-6
+              r=1.9 
+          else
+c     bcc
+              xm=2.9d0
+              b=0.2725d-6
+              r=1.9 
        endif
       
        if (ele.eq.0.d0) then
@@ -774,52 +763,24 @@ c     1 'converge after',i3, 'iterations')
        td=gnd+ssd
        
        
-        !значение градиента
-       statev(10)= SVAR(npt,10)        !    Svar (10) 
-       statev(11)=(1000000.0d0)*ssd   ! to plot ssd in m^-2 Svar (11) 
-       statev(12)=(1000.0d0)*gnd      ! to plot in m^-2 Svar (12)
-       statev(13)=td                       !    Svar (13)
-!       statev(6+2*ntens)=deqpl                    !    Svar (14)
-!       statev(7+2*ntens)=td-statev(5+2*ntens)     !    Svar (15)    
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      ! eelas=eelas+dstran
-      ! call vzero(sigElp, 6)
-      !do i=1,ntens
-      !   do j=1,ntens
-      !     
-      !      sigElp(i) =  sigElp(i)+ddsdde(j,i)*dstran(j)
-      !   end do
-      !   stress(i) = sigElp(i) + sigi(i)
-      !end do
-      !
-   
-       
-       
+c     gradient 
+       statev(10)= SVAR(npt,10) 
+c     to plot ssd in m^-2 
+       statev(11)=(1000000.0d0)*ssd
+c     to plot gnd in m^-2 
+       statev(12)=(1000.0d0)*gnd
+c     total dislocations
+       statev(13)=td 
+c       statev(6+2*ntens)=deqpl                    !    Svar (14)
+c       statev(7+2*ntens)=td-statev(5+2*ntens)     !    Svar (15)    
       endif 
-
-!
-!     
-!      
-!     
-!
 100   continue     
-      
+c      
       statev(1)=coords(1)
       statev(2)=coords(2)
       statev(3)=coords(3)
       return
       end
-
 
       
       subroutine elasticstiffnes(Ex, nu, mcomp, outmatrix)
