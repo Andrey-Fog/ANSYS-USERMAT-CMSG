@@ -33,11 +33,11 @@ KEYOPT,1,6,0
 !!! Define parameters related to CMSG model 
 
 Young	= 200000 	!- Modulus of Elasticity
-nu	= 0.3		!– Poisson ratio
+nu	= 0.3		!- Poisson ratio
 S02	= 300 		!- Yield Strength
 Leng 	= 1E-6		!- Length parameter in the CMSG model (approximate order 1e-6 meters)
-SHE	= 0.15 		!– Strain hardering exponent (0 < N < 1) 
-Flag 	= 1 		!– Flag  0 or 1. https://doi.org/10.1016/S1359-6454(99)00020-8 Usually 1 for metals
+SHE	= 0.15 		!- Strain hardering exponent (0 < N < 1) 
+Flag 	= 1 		!- Flag  0 or 1. https://doi.org/10.1016/S1359-6454(99)00020-8 Usually 1 for metals
 
 !base model
 TB,USER,1,1,6,  
