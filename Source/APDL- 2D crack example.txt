@@ -1,0 +1,597 @@
+
+FINISH
+/clear
+
+/PREP7
+
+!Plate width
+WDTH=0.2
+!Crack length
+CRCKL=0.01
+!Radius of 1st polar
+CRCKR=CRCKL/2*0.01
+!Number of elements at 90 degrees
+NPOLAR=12
+!Plane stress (0) or plain strain flag (1)
+SLNTYPE=1
+
+
+ET,1,PLANE182 
+KEYOPT,1,1,0
+
+*IF,SLNTYPE,EQ,1,THEN
+		KEYOPT,1,3,2
+	*ELSE
+		KEYOPT,1,3,0
+*ENDIF
+
+KEYOPT,1,6,0
+
+
+!*************************** MECHANICAL PROPERTIES
+
+!!! Define parameters related to CMSG model 
+
+Young	= 200000 	!- Modulus of Elasticity
+nu	= 0.3		!– Poisson ratio
+S02	= 300 		!- Yield Strength
+Leng 	= 1E-6		!- Length parameter in the CMSG model (approximate order 1e-6 meters)
+SHE	= 0.15 		!– Strain hardering exponent (0 < N < 1) 
+Flag 	= 1 		!– Flag  0 or 1. https://doi.org/10.1016/S1359-6454(99)00020-8 Usually 1 for metals
+
+!base model
+TB,USER,1,1,6,  
+TBTEMP,0
+TBDATA,,Young,nu,S02,Leng,SHE,Flag
+
+
+TB,STAT,1,1,18, 
+TBTEMP,0
+TBDATA,,0,0,0,0,0,0  
+TBDATA,,0,0,0,0,0,0 
+TBDATA,,0,0,0,0,0,0 
+   
+
+
+!*************************** GEOMETRY
+
+K,1,CRCKL/2,,,
+K,2,CRCKL/2-CRCKR,,,
+K,3,CRCKL/2-CRCKR,,,
+K,4,CRCKL/2,-CRCKR,,
+K,5,CRCKL/2,+CRCKR,,
+K,6,CRCKL/2+CRCKR,,,
+K,7,,,,
+K,8,,,,
+K,9,-CRCKL/2,,,
+K,10,-CRCKL/2+CRCKR,,,
+K,11,-CRCKL/2+CRCKR,,,
+K,12,-CRCKL/2,-CRCKR,,
+K,13,-CRCKL/2,+CRCKR,,
+K,14,-CRCKL/2-CRCKR,,,
+
+K,15,CRCKL,,,
+K,16,CRCKL,-CRCKL/2,,
+K,17,CRCKL,CRCKL/2,,
+K,18,CRCKL/2,-CRCKL/2,,
+K,19,CRCKL/2,CRCKL/2,,
+K,20,,-CRCKL/2,,
+K,21,,CRCKL/2,,
+
+
+K,22,-CRCKL/2,-CRCKL/2,,
+K,23,-CRCKL/2,CRCKL/2,,
+K,24,-CRCKL,-CRCKL/2,,
+K,25,-CRCKL,CRCKL/2,,
+K,26,-CRCKL,,,
+
+LSTR,       1,       3 
+LSTR,       1,       2  
+LSTR,       3,       7 
+LSTR,       2,       8 
+LSTR,       11,      7 
+LSTR,       10,       8  
+LSTR,       9,      11
+LSTR,       9,      10 
+
+LARC,2,4,1,CRCKR,  
+LARC,4,6,1,CRCKR,  
+LARC,6,5,1,CRCKR,  
+LARC,5,3,1,CRCKR,  
+
+LARC,11,13,9,CRCKR,  
+LARC,13,14,9,CRCKR,  
+LARC,14,12,9,CRCKR,  
+LARC,12,10,9,CRCKR,  
+ 
+LSTR,       1,       4  
+LSTR,       1,       5  
+LSTR,       1,       6
+LSTR,       9,       12  
+LSTR,       9,       13  
+LSTR,       9,       14
+ 
+LSTR,       6,       15 
+LSTR,       5,       19
+LSTR,       7,       21 
+LSTR,       13,      23
+LSTR,       14,      26 
+LSTR,       12,      22 
+LSTR,       8,       20
+LSTR,       4,       18
+ 
+LSTR,       15,      17 
+LSTR,       17,      19 
+LSTR,       19,      21 
+LSTR,       21,      23 
+LSTR,       23,      25
+LSTR,       25,      26
+LSTR,       26,      24   
+LSTR,       24,      22 
+LSTR,       22,      20 
+LSTR,       20,      18 
+LSTR,       18,      16
+LSTR,       16,      15
+
+K,27,WDTH/2,,,
+K,28,WDTH/2,-WDTH/2,,
+K,29,WDTH/2,WDTH/2,,
+K,30,,-WDTH/2,,
+K,31,,WDTH/2,,
+K,32,-WDTH/2,-WDTH/2,,
+K,33,-WDTH/2,WDTH/2,,
+K,34,-WDTH/2,,,
+
+
+LSTR,       15,      27
+LSTR,       21,      31  
+LSTR,       26,      34
+LSTR,       20,      30
+ 
+
+LSTR,       27,      29
+LSTR,       29,      31  
+LSTR,       31,      33
+LSTR,       33,      34
+LSTR,       34,      32
+LSTR,       32,      30  
+LSTR,       30,      28
+LSTR,       28,      27
+
+
+!/PNUM,KP,1  
+!/PNUM,LINE,1
+
+!***AREAS
+FLST,2,3,4  
+FITEM,2,1   
+FITEM,2,18  
+FITEM,2,12  
+AL,P51X 
+FLST,2,3,4  
+FITEM,2,2   
+FITEM,2,9  
+FITEM,2,17  
+AL,P51X 
+FLST,2,3,4  
+FITEM,2,18   
+FITEM,2,19  
+FITEM,2,11  
+AL,P51X 
+FLST,2,3,4  
+FITEM,2,17   
+FITEM,2,19  
+FITEM,2,10  
+AL,P51X 
+
+FLST,2,3,4  
+FITEM,2,7   
+FITEM,2,13  
+FITEM,2,21  
+AL,P51X 
+FLST,2,3,4  
+FITEM,2,8   
+FITEM,2,20  
+FITEM,2,16  
+AL,P51X 
+FLST,2,3,4  
+FITEM,2,21   
+FITEM,2,22  
+FITEM,2,14  
+AL,P51X 
+FLST,2,3,4  
+FITEM,2,20   
+FITEM,2,22  
+FITEM,2,15  
+AL,P51X 
+
+FLST,2,5,4  
+FITEM,2,9   
+FITEM,2,4  
+FITEM,2,29  
+FITEM,2,40 
+FITEM,2,30  
+AL,P51X 
+FLST,2,5,4  
+FITEM,2,10  
+FITEM,2,30  
+FITEM,2,41  
+FITEM,2,42  
+FITEM,2,23  
+AL,P51X 
+FLST,2,5,4  
+FITEM,2,11  
+FITEM,2,23  
+FITEM,2,31  
+FITEM,2,32  
+FITEM,2,24  
+AL,P51X 
+FLST,2,5,4  
+FITEM,2,12  
+FITEM,2,24  
+FITEM,2,33  
+FITEM,2,25   
+FITEM,2,3  
+AL,P51X 
+
+FLST,2,5,4  
+FITEM,2,13  
+FITEM,2,5  
+FITEM,2,25  
+FITEM,2,34  
+FITEM,2,26  
+AL,P51X 
+FLST,2,5,4  
+FITEM,2,14  
+FITEM,2,26  
+FITEM,2,35  
+FITEM,2,36  
+FITEM,2,27  
+AL,P51X 
+FLST,2,5,4  
+FITEM,2,15  
+FITEM,2,27  
+FITEM,2,37  
+FITEM,2,38  
+FITEM,2,28  
+AL,P51X 
+FLST,2,5,4  
+FITEM,2,16  
+FITEM,2,28  
+FITEM,2,39  
+FITEM,2,29  
+FITEM,2,6  
+AL,P51X 
+
+FLST,2,7,4  
+FITEM,2,45  
+FITEM,2,36  
+FITEM,2,35  
+FITEM,2,34  
+FITEM,2,44  
+FITEM,2,49  
+FITEM,2,50  
+AL,P51X 
+FLST,2,7,4  
+FITEM,2,45  
+FITEM,2,51  
+FITEM,2,52  
+FITEM,2,46  
+FITEM,2,39  
+FITEM,2,38  
+FITEM,2,37  
+AL,P51X 
+FLST,2,7,4  
+FITEM,2,42  
+FITEM,2,41  
+FITEM,2,40  
+FITEM,2,46  
+FITEM,2,53  
+FITEM,2,54  
+FITEM,2,43  
+AL,P51X 
+FLST,2,7,4  
+FITEM,2,43  
+FITEM,2,47  
+FITEM,2,48  
+FITEM,2,44  
+FITEM,2,33  
+FITEM,2,32  
+FITEM,2,31  
+AL,P51X 
+
+!*************************** MESHING
+FLST,5,18,4,ORDE,4  
+FITEM,5,1   
+FITEM,5,-2  
+FITEM,5,7   
+FITEM,5,-22 
+CM,_Y,LINE  
+LSEL, , , ,P51X 
+CM,_Y1,LINE 
+CMSEL,,_Y   
+LESIZE,_Y1, , ,NPOLAR, , , , ,0 
+!* 
+FLST,5,10,4,ORDE,7  
+FITEM,5,3   
+FITEM,5,-6  
+FITEM,5,23  
+FITEM,5,-24 
+FITEM,5,26  
+FITEM,5,-28 
+FITEM,5,30  
+CM,_Y,LINE  
+LSEL, , , ,P51X 
+CM,_Y1,LINE 
+CMSEL,,_Y   
+!*  
+LESIZE,_Y1, , ,CRCKL/(50*CRCKR)*NPOLAR,50 , , , ,0 
+
+!*  
+FLST,5,18,4,ORDE,8  
+FITEM,5,25  
+FITEM,5,29  
+FITEM,5,31  
+FITEM,5,-42 
+FITEM,5,47  
+FITEM,5,50  
+FITEM,5,-51 
+FITEM,5,54   
+CM,_Y,LINE  
+LSEL, , , ,P51X 
+CM,_Y1,LINE 
+CMSEL,,_Y   
+!*  
+LESIZE,_Y1, , ,NPOLAR/2, , , , ,0  
+!*  
+FLST,5,4,4,ORDE,4   
+FITEM,5,48  
+FITEM,5,-49 
+FITEM,5,52  
+FITEM,5,-53 
+CM,_Y,LINE  
+LSEL, , , ,P51X 
+CM,_Y1,LINE 
+CMSEL,,_Y   
+!*  
+LESIZE,_Y1, , ,NPOLAR,, , , ,0
+!* 
+FLST,5,4,4,ORDE,2   
+FITEM,5,43  
+FITEM,5,-46 
+CM,_Y,LINE  
+LSEL, , , ,P51X 
+CM,_Y1,LINE 
+CMSEL,,_Y   
+!*  
+LESIZE,_Y1, , ,NPOLAR*2,50, , , ,0
+
+
+MSHAPE,0,2D 
+MSHKEY,1
+!*  
+FLST,5,8,5,ORDE,2   
+FITEM,5,1   
+FITEM,5,-8  
+CM,_Y,AREA  
+ASEL, , , ,P51X 
+CM,_Y1,AREA 
+CHKMSH,'AREA'   
+CMSEL,S,_Y  
+!*  
+AMESH,_Y1   
+!*  
+CMDELE,_Y   
+CMDELE,_Y1  
+CMDELE,_Y2 
+!*  
+
+FLST,2,2,4,ORDE,2   
+FITEM,2,35  
+FITEM,2,-36 
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,37  
+FITEM,2,-38 
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,29  
+FITEM,2,39  
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,25  
+FITEM,2,34  
+LCCAT,P51X  
+FLST,5,4,5,ORDE,2   
+FITEM,5,13  
+FITEM,5,-16 
+CM,_Y,AREA  
+ASEL, , , ,P51X 
+CM,_Y1,AREA 
+CHKMSH,'AREA'   
+CMSEL,S,_Y  
+!*  
+AMESH,_Y1   
+!*  
+CMDELE,_Y   
+CMDELE,_Y1  
+CMDELE,_Y2  
+!*  
+CM,_Y,LINE  
+*SET,_Z1,LSINQR(0,13)   
+*IF,_z1,ne,0,then   
+LSEL,R,LCCA 
+*SET,_Z2,LSINQR(0,13)   
+LDELE,ALL   
+*SET,_Z3,_Z1-_Z2
+*IF,_Z3,NE,0,THEN   
+CMSEL,S,_Y  
+CMDELE,_Y   
+*ENDIF  
+*ELSE   
+CMSEL,S,_Y  
+CMDELE,_Y   
+*ENDIF  
+!*  
+/FOC,1,0.3,,,1  
+/REP,FAST   
+/FOC,1,0.3,,,1  
+/REP,FAST   
+FLST,2,2,4,ORDE,2   
+FITEM,2,25  
+FITEM,2,33  
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,29  
+FITEM,2,40  
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,41  
+FITEM,2,-42 
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,31  
+FITEM,2,-32 
+LCCAT,P51X  
+FLST,5,4,5,ORDE,2   
+FITEM,5,9   
+FITEM,5,-12 
+CM,_Y,AREA  
+ASEL, , , ,P51X 
+CM,_Y1,AREA 
+CHKMSH,'AREA'   
+CMSEL,S,_Y  
+!*  
+AMESH,_Y1   
+!*  
+CMDELE,_Y   
+CMDELE,_Y1  
+CMDELE,_Y2  
+!*  
+CM,_Y,LINE  
+*SET,_Z1,LSINQR(0,13)   
+*IF,_z1,ne,0,then   
+LSEL,R,LCCA 
+*SET,_Z2,LSINQR(0,13)   
+LDELE,ALL   
+*SET,_Z3,_Z1-_Z2
+*IF,_Z3,NE,0,THEN   
+CMSEL,S,_Y  
+CMDELE,_Y   
+*ENDIF  
+*ELSE   
+CMSEL,S,_Y  
+CMDELE,_Y   
+*ENDIF  
+!*  
+FLST,2,3,4,ORDE,2   
+FITEM,2,34  
+FITEM,2,-36 
+LCCAT,P51X  
+FLST,2,3,4,ORDE,2   
+FITEM,2,37  
+FITEM,2,-39 
+LCCAT,P51X  
+FLST,2,3,4,ORDE,2   
+FITEM,2,40  
+FITEM,2,-42 
+LCCAT,P51X  
+FLST,2,3,4,ORDE,2   
+FITEM,2,31  
+FITEM,2,-33 
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,49  
+FITEM,2,-50 
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,51  
+FITEM,2,-52 
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,53  
+FITEM,2,-54 
+LCCAT,P51X  
+FLST,2,2,4,ORDE,2   
+FITEM,2,47  
+FITEM,2,-48 
+LCCAT,P51X  
+FLST,5,4,5,ORDE,2   
+FITEM,5,17  
+FITEM,5,-20 
+CM,_Y,AREA  
+ASEL, , , ,P51X 
+CM,_Y1,AREA 
+CHKMSH,'AREA'   
+CMSEL,S,_Y  
+!*  
+AMESH,_Y1   
+!*  
+CMDELE,_Y   
+CMDELE,_Y1  
+CMDELE,_Y2  
+!*  
+CM,_Y,LINE  
+*SET,_Z1,LSINQR(0,13)   
+*IF,_z1,ne,0,then   
+LSEL,R,LCCA 
+*SET,_Z2,LSINQR(0,13)   
+LDELE,ALL   
+*SET,_Z3,_Z1-_Z2
+*IF,_Z3,NE,0,THEN   
+CMSEL,S,_Y  
+CMDELE,_Y   
+*ENDIF  
+*ELSE   
+CMSEL,S,_Y  
+CMDELE,_Y   
+*ENDIF 
+
+LPLOT
+/AUTO,1 
+/REP,FAST 
+
+!*************************** LOADS
+
+FLST,2,2,3,ORDE,2   
+FITEM,2,31  
+FITEM,2,30  
+!*  
+/GO 
+DK,P51X, , , ,0,UX, , , , , , 
+  
+FLST,2,2,4,ORDE,2   
+FITEM,2,52  
+FITEM,2,-53 
+!*  
+/GO 
+DL,P51X, ,UY,   
+
+FLST,2,2,4,ORDE,2   
+FITEM,2,48  
+FITEM,2,-49 
+!*  
+/GO 
+!DL,P51X, ,UY,0.005  
+SFL,P51X,PRES,-300, 
+
+!*************************** SOLUTION
+FINISH
+/SOL
+!nlgeom,on
+!eresx,no
+OUTRES,ALL,LAST
+OUTRES,SVAR,LAST
+time,1
+nsubst,10,1000,10
+SAVE
+SOLVE
+
+
+!*************************** RESULTS
+FINISH 
+/POST1
+SET,LAST
+!Plot gradient value
+PLNSOL, SVAR, 10, 0,1.0 
+/REPLOT 
