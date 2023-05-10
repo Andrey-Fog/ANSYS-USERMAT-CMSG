@@ -197,8 +197,8 @@ c ***    harmonic analysis
 
 c ***    time domain analysis
 
-      IF(ncomp .GE. 4) THEN
-c ***    3d, plane strain and axisymmetric example
+      IF(ncomp .eq. 6) THEN
+c ***    3d
          call usermat3d (
      &                   matId, elemId,kDomIntPt, kLayer, kSectPt,
      &                   ldstep,isubst,keycut,
@@ -210,9 +210,23 @@ c ***    3d, plane strain and axisymmetric example
      &                   tsstif, epsZZ, cutFactor, 
      &                   var1, var2, var3, var4, var5,
      &                   var6, var7)
+         
+      ELSE IF(ncomp .EQ. 4) THEN
+c ***    plane strain and axisymmetric
+         call usermatpd (
+     &                   matId, elemId,kDomIntPt, kLayer, kSectPt,
+     &                   ldstep,isubst,keycut,
+     &                   nDirect,nShear,ncomp,nStatev,nProp,
+     &                   Time,dTime,Temp,dTemp,
+     &                   stress,ustatev,dsdePl,sedEl,sedPl,epseq,
+     &                   Strain,dStrain, epsPl, prop, coords,
+     &                   var0, defGrad_t, defGrad,
+     &                   tsstif, epsZZ, cutFactor, 
+     &                   var1, var2, var3, var4, var5,
+     &                   var6, var7)   
 
       ELSE IF(nDirect.eq. 2 .and. ncomp .EQ. 3) THEN
-c ***    plane stress example
+c ***    plane stress 
          call usermatps (
      &                   matId, elemId,kDomIntPt, kLayer, kSectPt,
      &                   ldstep,isubst,keycut,
@@ -226,7 +240,7 @@ c ***    plane stress example
      &                   var6, var7)
 
       ELSE IF(ncomp .EQ. 3) THEN
-c ***    3d beam example
+c ***    3d beam not realized
          call usermatbm (
      &                   matId, elemId,kDomIntPt, kLayer, kSectPt,
      &                   ldstep,isubst,keycut,
@@ -240,7 +254,7 @@ c ***    3d beam example
      &                   var6, var7)
 
       ELSE IF(ncomp .EQ. 1) THEN
-c ***    1d beam example
+c ***    1d beam not realized
          call usermat1d (
      &                   matId, elemId,kDomIntPt, kLayer, kSectPt,
      &                   ldstep,isubst,keycut,
