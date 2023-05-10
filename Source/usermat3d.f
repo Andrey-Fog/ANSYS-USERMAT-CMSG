@@ -59,7 +59,7 @@ c     auxiliary parameters for derivatives
 
       parameter newton=1000, toler=1.0d-8
       DOUBLE PRECISION eelas(ntens),eplas(ntens)
-c     matrices for finding the Jacobian
+c     matrices for Jacobian determination
       DOUBLE PRECISION xjacm(3,3), xjaci(3,3)
       DOUBLE PRECISION a1, a2, a3, a4, a5, a6, a7, a8,
      &  b1, b2, b3, b4, b5, b6, b7, b8,
@@ -98,8 +98,9 @@ c     temp parameters
      &                 )      
       
         DATA G/1.0D0,1.0D0,1.0D0,0.0D0,0.0D0,0.0D0/
-
-        
+c
+c     Some of the default names is changed here
+c        
 c     input arguments
 c     ===============
 c      cmname     (int,sc,i)               material #
@@ -617,8 +618,7 @@ c     Save obtained gradients
           enddo
           
        endif
-         
-                    
+                            
        xiden=0.d0
        do i=1,3
         xiden(i,i)=1.d0   

@@ -93,14 +93,10 @@ c
       ddsdde(3,1)=0
       ddsdde(3,2)=0
       ddsdde(3,3)=elam*(1.d0-xnue)/2
-      
-       
 
-  
       ebulk3=E/(1.d0-2.d0*xnue)
       xk=ebulk3/3.d0 
-      
-      
+   
 c     Rewrite  
       if (all(dstran .eq. 0)) then
           if (npt.eq.1) then
@@ -459,7 +455,9 @@ c
 50    return
       end   
     
-                  SUBROUTINE REVERSE(N,A,C)
+      SUBROUTINE REVERSE(N,A,C)
+c
+c     Main function: Return the inverse matrix
 c     input ...
 c     a(n,n) - array of coefficients for matrix A
 c     n      - dimension
@@ -468,7 +466,7 @@ c     c(n,n) - inverse matrix of A
 c     comments ...
 c     the original matrix a(n,n) will be destroyed 
 c     during the calculation
-            !===========================================================
+c *** ===========================================================
             implicit none 
             integer n
             double precision A(n,n), C(n,n), OOO(n,2*n), lkl(n,2*n) 

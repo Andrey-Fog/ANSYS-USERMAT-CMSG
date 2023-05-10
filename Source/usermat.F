@@ -1,4 +1,4 @@
-*deck,usermat      USERDISTRIB  parallel                                gal
+*deck,usermat      USERDISTRIB  parallel                                gal       
       subroutine usermat(
      &                   matId, elemId,kDomIntPt, kLayer, kSectPt,
      &                   ldstep,isubst,keycut,
@@ -11,40 +11,41 @@
      &                   cutFactor, pVolDer, hrmflg, var3, var4,
      &                   var5, var6, var7)
 c
-!DEC$ ATTRIBUTES DLLEXPORT, ALIAS:"USERMAT"::usermat  
+!DEC$ ATTRIBUTES DLLEXPORT, ALIAS:"USERMAT"::usermat 
 c
 c*************************************************************************
 c     *** primary function ***
 c
-c           user defined material constitutive model
+c         The conventional theory of mechanism-based strain gradient plasticity model
+c         If you use this code for research or industrial purposes, please cite:
+c             V. Shlyannikov, E. Martinez-Paneda, A. Tumanov, A. Tartygasheva,
+c             Crack tip fields and fracture resistance parameters based on strain gradient plasticity,
+c             International Journal of Solids and Structures, Volumes 208–209, 2021, Pages 63-82      
+c         https://doi.org/10.1016/j.ijsolstr.2020.10.015
+c
+c         Also more information can be found in
+c             V. Shlyannikov, E. Martinez-Paneda, A. Tumanov, R. Khamidullin,
+c             Mode I and mode II stress intensity factors and dislocation density behaviour in strain gradient plasticity,
+c             Theoretical and Applied Fracture Mechanics, Volume 116, 2021, 103128 
+c         https://doi.org/10.1016/j.tafmec.2021.103128
 c
 c      Attention:
 c           User must define material constitutive law properly
 c           according to the stress state such as 3D, plane strain
-c           and axisymmetry, plane stress and 3D/1D beam.
+c           and axisymmetry or plane stress. 
 c
-c           A 3D material constitutive model can be used for
-c           plane strain and axisymmetry cases.
+c           A 3D material constitutive model present in usermat3d.F
+c           Plane strain and axisymmetry cases can be found in usermatpd.F
+c           For plane stress use usermatps.F
+c           By default final library contained all this subroutines.       
+c           
+c           Be careful the state variable array is different in all subroutines!
 c
-c           When using shell elements, a plane stress algorithm
-c           must be used.
-c
-c                                             gal July, 1999
-c
-c       The following demonstrates a USERMAT subroutine for 
-c       a plasticity model, which is the same as TB, BISO,
-c       for different stress states. 
-c       See "ANSYS user material subroutine USERMAT" for detailed
-c       description of how to write a USERMAT routine.
-c
-c       This routine calls four routines,
-c       usermat3d.F, usermatps.F usermatbm.F and usermat1d.F, w.r.t.
-c       the corresponding stress states.
-c       Each routine can be also a usermat routine for the specific 
-c       element.
+c************************************************************************* 
+c 
 c
 c*************************************************************************
-c Copyright ANSYS.  All Rights Reserved.
+c This part of comments is copied from ANSYS documentation
 c
 c     input arguments
 c     ===============
@@ -183,20 +184,6 @@ c
 c*************************************************************************
 c
 
-c ***    harmonic analysis
-
-      IF(nint(hrmflg)/=0)THEN
-         call usermat_harm (
-     &                   matId, elemId,kDomIntPt, kLayer, kSectPt,
-     &                   ldstep,isubst,keycut,
-     &                   nDirect,nShear,ncomp,nProp,
-     &                   Time,dTime,Temp,stress,dsdePl, tsstif,
-     &                   Strain,prop,coords)
-         return
-       ENDIF
-
-c ***    time domain analysis
-
       IF(ncomp .eq. 6) THEN
 c ***    3d
          call usermat3d (
@@ -240,6 +227,9 @@ c ***    plane stress
      &                   var6, var7)
 
       ELSE IF(ncomp .EQ. 3) THEN
+c ***    Following subroutines not realized here 
+c        It's needed for correct ANSYS work
+c
 c ***    3d beam not realized
          call usermatbm (
      &                   matId, elemId,kDomIntPt, kLayer, kSectPt,
@@ -268,6 +258,15 @@ c ***    1d beam not realized
      &                   var6, var7)
 
       END IF
+      IF(nint(hrmflg)/=0)THEN
+         call usermat_harm (
+     &                   matId, elemId,kDomIntPt, kLayer, kSectPt,
+     &                   ldstep,isubst,keycut,
+     &                   nDirect,nShear,ncomp,nProp,
+     &                   Time,dTime,Temp,stress,dsdePl, tsstif,
+     &                   Strain,prop,coords)
+         return
+       ENDIF
       return
       end      
 *deck,usermat1d    USERDISTRIB  parallel                                gal

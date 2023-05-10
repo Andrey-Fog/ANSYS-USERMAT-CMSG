@@ -62,15 +62,13 @@ c      ANSYS help says that following ABAQUS functions in not needed
 c         call rotsig(statev(1), drot, eelas, 2, ndi, nshr)
 c         call rotsig(statev(ntens+1), drot, eplas, 2, ndi, nshr)
 c      SVAR = 0
-      
-      
-
+c
 c *** Obtaining plastic strains from previous iteration
       eqplas=statev(1+2*ntens)
       eelas=statev(1:4)
       eplas=statev(5:8)
-c      eplas =epsPl
-            
+c     
+c     Elastic properties            
       E=props(1)
       xnue=props(2)
       ebulk3=E/(1.d0-2.d0*xnue)
@@ -92,7 +90,8 @@ c     stiffness matrix
 c     it's needed for calculation of hourglass stiffness,
 c     tsstif have no analog in ABAQUS
       tsstif(1)=eg
-c     Rewrite  
+      
+c     This is not best solution to initialize kplastic module  
       if (all(dstran .eq. 0)) then
           if (npt.eq.1) then
               strainp=0.d0    
