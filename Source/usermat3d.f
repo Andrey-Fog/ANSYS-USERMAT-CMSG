@@ -298,8 +298,6 @@ c     adopted linear shape functions
          deriv(1,8)=-P007*(P057*r + 1)*(P057*t + 1)
          deriv(2,8)=-P057*(P057*r + 1)*(P007*s - P108)
          deriv(3,8)=-P057*(P057*t + 1)*(P007*s - P108)
-   
-
           
 c     xjacm array structure
 c     columns are global x y z coordinates
