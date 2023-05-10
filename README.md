@@ -80,7 +80,7 @@ That's all. Further we work as with the usual scheme.
 <br>
 <br>
 
-### COMPILATOR SETTINGS (*projectname*->properties). 
+#### COMPILATOR SETTINGS (*projectname*->properties). 
 
 | Name     |   | Value |
 | ----------- | ----------- |----------- |
@@ -93,7 +93,7 @@ That's all. Further we work as with the usual scheme.
 |Preprocessor Definitions to fpp only:| -|	Yes (/noD)  |
 |Use Portlib Library:| 		 - |	            Yes (/4Yportlib)  |
 
-### LINKER SETTINGS  
+#### LINKER SETTINGS  
 | Name    |  |    Value |
 | ----------- | ----------- |----------- |
 |Enable incremental linking:| - |		No (/INCREMENTAL:NO)  |
