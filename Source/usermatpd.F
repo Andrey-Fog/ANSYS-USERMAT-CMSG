@@ -11,8 +11,10 @@
      &                   var6, var7, var8)
 !DEC$ ATTRIBUTES DLLEXPORT, ALIAS:"USERMATPD"::usermatpd
 #include "impcom.inc"   
-      EXTERNAL         kdevia, keff, GET_ELMDATA, ELPREV 
-              INTEGER 
+      EXTERNAL         kdevia, keff
+      EXTERNAL         GET_ELMDATA, PUT_ELMDATA
+      
+      INTEGER 
      &                 matId, noel,
      &                 npt, Layer, jstep, kspt,
      &                 kdstep,kinc,keycut,
@@ -37,8 +39,6 @@ c
       DOUBLE PRECISION 
      1 ddsddt(ntens),drplde(ntens),
      2 predef(1),dpred(1),drot(3,3)
-    
-     
 
       parameter newton=1000, toler=1.0d-8
 
@@ -58,12 +58,24 @@ c
 c     state variables array for all integration points
       DOUBLE PRECISION SVAR(4,nstatv), SVARtmp(nstatv)      
 c
+ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+c     obtain the gradient values from all integration points
+      SVAR=0.d0
+      do i=1,4
+         call get_ElmData ('SVAR', noel,i, nstatv, SVARtmp)
+          do j=1,nstatv
+              SVAR(i,j)=SVARtmp(j)
+         enddo
+      enddo
 c     elastic strains
       eelas=stran - epsPl
 c     
-c     Elastic properties            
+c *** Material properties  
+c     Young modulus           
       E=props(1)
+c     Poisson ratio
       xnue=props(2)
+
       ebulk3=E/(1.d0-2.d0*xnue)
       xk=ebulk3/3.d0
       eg2=E/(1.d0+xnue)
@@ -131,12 +143,17 @@ c     adopted linear shape functions
          xjacm(2,2)= deriv(2,1)*SVAR(1,2)+deriv(2,2)*SVAR(2,2)
      1 +deriv(2,3)*SVAR(3,2)+deriv(2,4)*SVAR(4,2) 
 
-         djacb=xjacm(1,1)*xjacm(2,2)-xjacm(1,2)*xjacm(2,1) 
+         if (all(xjacm .eq. 0)) then 
+              xjaci=0
+           else
+             djacb=xjacm(1,1)*xjacm(2,2)-xjacm(1,2)*xjacm(2,1) 
       
-         xjaci(1,1)=xjacm(2,2)/djacb 
-         xjaci(1,2)=-xjacm(1,2)/djacb  
-         xjaci(2,1)=-xjacm(2,1)/djacb   
-         xjaci(2,2)=xjacm(1,1)/djacb
+             xjaci(1,1)=xjacm(2,2)/djacb 
+             xjaci(1,2)=-xjacm(1,2)/djacb  
+             xjaci(2,1)=-xjacm(2,1)/djacb   
+             xjaci(2,2)=xjacm(1,1)/djacb
+           end if
+           
          !dN/dx
          a1=xjaci(1,1)*deriv(1,1)+xjaci(1,2)*deriv(2,1) 
          a2=xjaci(1,1)*deriv(1,2)+xjaci(1,2)*deriv(2,2) 
@@ -285,7 +302,8 @@ c
         stress(j)=dstre(j)+xk*ep
        enddo
        stress(4)=dstre(4)
-      
+       statev(4:7)= dpstran
+       
        q=(2.d0/3.d0)*(sigmae/def)
        r=((h-(deqpl/sigmae))/(def*sigmae))*(3.d0*eg)/(1.d0+3.d0*eg*h)
       

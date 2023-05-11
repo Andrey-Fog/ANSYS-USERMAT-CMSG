@@ -20,7 +20,8 @@ c     Coordinates of integration points in the coordinate system s-t-r = ± 0.57
 c
 #include "impcom.inc"
 c
-      EXTERNAL         kdevia, keff, GET_ELMDATA, ELPREV, REVERSE
+      EXTERNAL         kdevia, keff,  ELPREV, REVERSE
+      EXTERNAL         GET_ELMDATA, PUT_ELMDATA
               INTEGER 
      &                 matId, noel,
      &                 npt, Layer, jstep, kspt,
