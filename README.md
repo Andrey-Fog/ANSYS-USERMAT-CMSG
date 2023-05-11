@@ -1,7 +1,7 @@
 # ANSYS-USERMAT-CMSG
 The conventional theory of mechanism-based strain gradient plasticity is realized via ANSYS user programmable features for USERMAT subroutine. 
 
- In source files you can find a APDL script example for 2D cracked body. After compiling and attaching present USERMAT subroutine copy [this file](https://github.com/Andrey-Fog/ANSYS-USERMAT-CMSG/blob/main/Source/APDL-%202D%20crack%20example.txt) to ANSYS Mechanical command line.
+ In source files you can find a APDL script example for 2D cracked body. After compiling and attaching present dynamic link library as ANSYS user material copy and run [this file](https://github.com/Andrey-Fog/ANSYS-USERMAT-CMSG/blob/main/Source/APDL-%202D%20crack%20example.txt) from ANSYS Mechanical command line.
 
  ## Research results  
  - [Crack tip fields and fracture resistance parameters based on strain gradient plasticity](https://doi.org/10.1016/j.ijsolstr.2020.10.015)  
