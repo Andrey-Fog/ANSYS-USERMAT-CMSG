@@ -1,5 +1,5 @@
 *deck,usermatps    USERDISTRIB  parallel                                gal
-      subroutine usermatps(
+      subroutine usermatpps(
      &                   matId, noel,npt, layer, kspt,
      &                   jstep,kinc,keycut,
      &                   ndi,nshr,ntens,nstatv,nprop,
