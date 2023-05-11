@@ -69,9 +69,12 @@ c     obtain the gradient values from all integration points
               SVAR(i,j)=SVARtmp(j)
          enddo
       enddo
+      call get_ElmData ('EPTO', noel, npt, 4, eelas)
+      call get_ElmData ('EPPL', noel, npt, 4, eplas)
       call get_ElmData ('SIG', noel,npt, 3, sigi)
-c     elastic strains
-      eelas=stran - epsPl
+       do i=1,4
+          eelas(i) = eelas(i) - eplas (i)
+       enddo 
       
 c *** Material properties  
 c     Young modulus
@@ -340,23 +343,20 @@ c
        destran(3)=dstra(3,3)-dpstran(3)
        destran(4)=dstran(3)-dpstran(4)
        
-       epsPl=epsPl+dpstran
+       eplas=eplas+dpstran
        eelas=eelas+destran
        ep=(eelas(1)+eelas(2)+eelas(3))
        
-       stran(1)=eelas(1)+epsPl(1)
-       stran(2)=eelas(2)+epsPl(2)
-       stran(3)=eelas(4)+epsPl(4)
+       stran(1)=eelas(1)+eplas(1)
+       stran(2)=eelas(2)+eplas(2)
+       stran(3)=eelas(4)+eplas(4)
 
        do j=1,3
         stress(j)=dstre(j)+xk*ep
        enddo
        stress(3)=dstre(4)
 
-c     Svar (1-4)
-       statev(1:4)=eelas  
-c     Svar (5-8)
-       statev(5:8)=eplas                  
+             
 c *** elastic strain and put into epsZZ
       epsZZ    = -xnue/E * (stress(1) + stress(2))
 c *** add plastic strain to total strain epsZZ
