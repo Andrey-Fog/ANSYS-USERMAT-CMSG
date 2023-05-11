@@ -18,8 +18,7 @@ The conventional theory of mechanism-based strain gradient plasticity is realize
 
 ---
 
-Install Visual Studio first and then Intel fortran compiler. When installing the compiler, select "Integrate into Visual Studio". Supported versions can be found in the ANSYS documentation in the section on User Programmable Features (UPF). Add LIB and INCLUDE variables in the system environment. Create new solution and add new fortran dll project. The name of the created library must be "USERMATLIB.DLL"
-
+Install Visual Studio first and then Intel fortran compiler. When installing the compiler, select "Integrate into Visual Studio". Supported versions can be found in the ANSYS documentation in the section on User Programmable Features (UPF). Add LIB and INCLUDE variables in the system environment. Create new solution and add new fortran dll project. The name of the created library must be "USERMATLIB.DLL". Add all fortran files from Source directory to your dll project. Tune compiler according to instructions present below. After compiling connect library to ANSYS.
 
 
 <br>
