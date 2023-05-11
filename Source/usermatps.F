@@ -56,7 +56,7 @@ c
       DOUBLE PRECISION a1, a2, a3, a4, b1, b2, b3, b4, djacb, etat,
      1 rhs, dabs, deqpl, ep, q, r, ene,
      2 xm ,b,gnd, ssd,td
-      
+c     branch testps      
 c     state variables array for all integration points
       DOUBLE PRECISION SVAR(4,nstatv), SVARtmp(nstatv)
       DOUBLE PRECISION tmp,lamme
@@ -420,10 +420,3 @@ c
       
       return
       end
- 
-
-
-
- 
-
-
