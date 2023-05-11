@@ -1,7 +1,7 @@
 # ANSYS-USERMAT-CMSG
 The conventional theory of mechanism-based strain gradient plasticity is realized via ANSYS user programmable features for USERMAT subroutine. 
 
- In source files you can find a APDL script example for 2D cracked body. After compiling and attaching present USERMAT subroutine copy [this file](https://github.com/Andrey-Fog/ANSYS-USERMAT-CMSG/blob/main/Source/APDL-%202D%20crack%20example.txt) to ANSYS Mechanical command line.
+ In source files you can find a APDL script example for 2D cracked body. After compiling and attaching present dynamic link library as ANSYS user material copy and run [this file](https://github.com/Andrey-Fog/ANSYS-USERMAT-CMSG/blob/main/Source/APDL-%202D%20crack%20example.txt) from ANSYS Mechanical command line.
 
 
 
@@ -23,8 +23,7 @@ I want to say thank a lot to ​​​[​Emilio Martínez Pañeda](https://www.
 
 ---
 
-Install Visual Studio first and then Intel fortran compiler. When installing the compiler, select "Integrate into Visual Studio". Supported versions can be found in the ANSYS documentation in the section on User Programmable Features (UPF). Add LIB and INCLUDE variables in the system environment. Create new solution and add new fortran dll project. The name of the created library must be "USERMATLIB.DLL"
-
+Install Visual Studio first and then Intel fortran compiler. When installing the compiler, select "Integrate into Visual Studio". Supported versions can be found in the ANSYS documentation in the section on User Programmable Features (UPF). Add LIB and INCLUDE variables in the system environment. Create new solution and add new fortran dll project. The name of the created library must be "USERMATLIB.DLL". Add all fortran files from Source directory to your dll project. Tune compiler according to instructions present below. After compiling connect library to ANSYS.
 
 
 <br>
@@ -99,7 +98,7 @@ That's all. Further we work as with the usual scheme.
 <br>
 <br>
 
-### COMPILATOR SETTINGS (*projectname*->properties). 
+#### COMPILATOR SETTINGS (*projectname*->properties). 
 
 | Name     |   | Value |
 | ----------- | ----------- |----------- |
@@ -112,7 +111,7 @@ That's all. Further we work as with the usual scheme.
 |Preprocessor Definitions to fpp only:| -|	Yes (/noD)  |
 |Use Portlib Library:| 		 - |	            Yes (/4Yportlib)  |
 
-### LINKER SETTINGS  
+#### LINKER SETTINGS  
 | Name    |  |    Value |
 | ----------- | ----------- |----------- |
 |Enable incremental linking:| - |		No (/INCREMENTAL:NO)  |
