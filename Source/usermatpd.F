@@ -255,10 +255,7 @@ c
         h=20.d0*defi*((sigmae/sigmaf)**19)*(1.d0/sigmaf)
         if(dabs(rhs).lt.toler) goto 20
        end do
-c       sigmae=0
-c       write(7,19) newton
-c   19 format(//,30x,'***warning - plasticity algorithm did not ',
-c     1 'converge after',i3, 'iterations')
+      keycut=1
    20 continue
 
        deqpl=def-sigmae/(3.d0*eg)
