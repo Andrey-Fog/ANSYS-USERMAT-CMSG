@@ -58,7 +58,7 @@ c     auxiliary parameters for derivatives
      2 predef(1),dpred(1),drot(3)
 
       parameter newton=1000, toler=1.0d-8
-      DOUBLE PRECISION eelas(ntens),eplas(ntens)
+      DOUBLE PRECISION eelas(ntens)
 c     matrices for Jacobian determination
       DOUBLE PRECISION xjacm(3,3), xjaci(3,3)
       DOUBLE PRECISION a1, a2, a3, a4, a5, a6, a7, a8,
@@ -71,8 +71,8 @@ c     matrices for Jacobian determination
      3 dstra(3,3),dstrad(3,3),strain(3,3)
       
       DOUBLE PRECISION E, xnue, ebulk3, xk,eg2, eg, elam,
-     1 eqplas,syield, ele, sigmaf,sigmae,h, def, defi
-     2 
+     1 syield, ele, sigmaf,sigmae,h, def, defi
+
       INTEGER k1, k2, i,kewton, k, kflag, j, prev,G(6)
       
       DOUBLE PRECISION  djacb, etat,
@@ -175,11 +175,7 @@ c     Structure of the ustatev() array
 c     1-3 Integration point coordinates in global system
 c     4-9 derivatives x,y,z,xy,yz,zx
 c     10  gradient
-
-c *** Obtaining plastic strains from previous iteration
-      
-      eplas =epsPl
-      eqplas=epseq
+c
 c     obtain the gradient values from all integration points
       SVAR=0.d0
       do i=1,8
@@ -189,7 +185,7 @@ c     obtain the gradient values from all integration points
          enddo
       enddo
 c     elastic strains
-      eelas=stran  - eplas
+      eelas=stran - epsPl
 c *** Material properties      
 c     Young modulus
       E=props(1)
@@ -198,12 +194,12 @@ c     Poisson ratio
 c     Yeld stress
       syield=props(3)
 c     characteristic length
-       ele=props(4)
+      ele=props(4)
 c     strain hardening exponent (0 < ene < 1)
-       ene=props(5)
+      ene=props(5)
 c     flag, statistically conserved dislocations. See Arsenlis and Parks (1998)
 c     in most cases is eq to 1
-       kflag=props(6)
+      kflag=props(6)
        
       ebulk3=E/(1.d0-2.d0*xnue)
 c     Bulk modulus
@@ -474,7 +470,7 @@ c     lines are s t r
         eta(10)=b1*SVAR(1,4) + b2*SVAR(2,4) + b3*SVAR(3,4)
      1        + b4*SVAR(4,4) + b5*SVAR(5,4) + b6*SVAR(6,4) 
      2        + b7*SVAR(7,4) + b8*SVAR(8,4) 
-        !dn212 !ó íåãî ïî÷åìó-òî ìèíóñ
+        !dn212 
         eta(11)=a1*SVAR(1,5) + a2*SVAR(2,5) + a3*SVAR(3,5)
      &        + a4*SVAR(4,5) + a5*SVAR(5,5) + a6*SVAR(6,5) 
      &        + a7*SVAR(7,5) + a8*SVAR(8,5)
@@ -674,7 +670,7 @@ c     1 'converged after',i3, 'iterations')
  20    continue   
           
        deqpl=def-sigmae/(3.d0*eg)
-       epseq=eqplas+deqpl
+       epseq=epseq+deqpl
 c
        dstr=strain*2.d0*eg/(1.d0+deqpl*3.d0*eg/sigmae)
 c
@@ -695,10 +691,10 @@ c
        dpstran(6)=2.d0*dpstrn(3,1)
 c       
        destran=dstran-dpstran
-       eplas=eplas+dpstran
+       epsPl=epsPl+dpstran
        eelas=eelas+destran
        ep=eelas(1)+eelas(2)+eelas(3)
-       stran=eelas+eplas
+       stran=eelas+epsPl
 c      
        do j=1,3
         stress(j)=dstre(j)+xk*ep
@@ -735,8 +731,6 @@ c ***  material jacobian matrix
 
        
 c *** OUTPUT
-c     plastic strains
-       epspl=eplas
        kflag=props(6)
        if (kflag.eq.1) then
 c     fcc
@@ -769,8 +763,7 @@ c     to plot gnd in m^-2
        statev(12)=(1000.0d0)*gnd
 c     total dislocations
        statev(13)=td 
-c       statev(6+2*ntens)=deqpl                    !    Svar (14)
-c       statev(7+2*ntens)=td-statev(5+2*ntens)     !    Svar (15)    
+  
       endif 
 100   continue     
 c      

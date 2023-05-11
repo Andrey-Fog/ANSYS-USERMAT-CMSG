@@ -3,11 +3,16 @@ The conventional theory of mechanism-based strain gradient plasticity is realize
 
  In source files you can find a APDL script example for 2D cracked body. After compiling and attaching present USERMAT subroutine copy [this file](https://github.com/Andrey-Fog/ANSYS-USERMAT-CMSG/blob/main/Source/APDL-%202D%20crack%20example.txt) to ANSYS Mechanical command line.
 
+
+
+
  ## Research results  
  - [Crack tip fields and fracture resistance parameters based on strain gradient plasticity](https://doi.org/10.1016/j.ijsolstr.2020.10.015)  
 
 - [Mode I and mode II stress intensity factors and dislocation density behaviour in strain gradient plasticity](https://doi.org/10.1016/j.tafmec.2021.103128)
 
+## Acknowledgment
+I want to say thank a lot to ​​​[​Emilio Martínez Pañeda](https://www.empaneda.com/) for the detailed presentation of his methods in open acsess and active assistance. This helped a lot in the implementation of CMSG theory into ANSYS. This project is reworked his ABAQUS subroutine presented [here](https://doi.org/10.1016/j.ijsolstr.2015.02.010). 
 
 
 <br>
@@ -64,15 +69,29 @@ User link path <ANS_USER_PATH>: *path to your folder*"
 *Structural->Specialized Materials->User material options->user material*
 
 
-And add cells. There should be 5 properties in total. Of which:
+And add cells. There should be 6 properties in total. Of which:
 
-|NN|  | Property |
-| ----------- | ----------- | ----------- |
-|C1| - |Young modulus  |
-|C2| - |Puasson ratio  |
-|C3| - |Yelding stress  | 
-|C4|-  |Strain hardening amplitude |  
-|C5| - |Strain hardening exponent  |
+| NN  |     | Property                              |
+| --- | --- | ------------------------------------  |
+|  C1 |  -  |Young modulus                          |
+|  C2 |  -  |Puasson ratio                          |
+|  C3 |  -  |Yelding stress                         | 
+|  C4 |  -  |Characteristic length                  |  
+|  C5 |  -  |Strain hardening exponent (0 < N < 1)  |
+|  C6 |  -  |flag, 0 or 1. [Usually](https://doi.org/10.1016/S1359-6454(99)00020-8) 1 for metals|
+
+**5. Add 13 state variables**  
+
+*Preprocessor->Material Props->Material models->Structural->Specialized Materials->User material options->State Variables*
+
+| SVAR| Value                                 |
+| --- | ------------------------------------- |
+| 1-3 | Coordinates of integration points     |
+| 4-9 | Derivatives x,y,z,xy,yz,zx            |
+|  10 | Gradient value                        |
+|  11 | Statically necessary dislocations     |
+|  12 | Geometrically necessary dislocations  |
+|  13 | Total density of dislocations         |
 
 That's all. Further we work as with the usual scheme.
 

@@ -11,7 +11,6 @@
      &                   var1, var2, var3, var4, var5,
      &                   var6, var7, var8)
 !DEC$ ATTRIBUTES DLLEXPORT, ALIAS:"USERMATPS"::usermatps 
-      use kplastic
 #include "impcom.inc"   
       EXTERNAL         kdevia, keff, GET_ELMDATA, ELPREV ,EGEN
               INTEGER 
@@ -21,7 +20,7 @@
      &                 nDi,nShr,ntens,nStatv,nProp
       DOUBLE PRECISION 
      &                 Time,    dTime,   Temp,    dTemp,
-     &                 sse,   spd,   epseq,   epsZZ, EGEN
+     &                 sse,   spd,   epseq,   epsZZ
       DOUBLE PRECISION 
      &                 stress  (ntens  ), statev (nstatv), 
      &                 ddsdde(ntens,ntens),
@@ -49,38 +48,56 @@ c
      2 eelas(4),dpstrn(3,3),eplas(4),strad(3,3),dstre(4),xjaci(2,2),
      3 dstra(3,3),dstrad(3,3),strain(3,3),eta(14),deriv(2,4),xjacm(2,2)
       
-      DOUBLE PRECISION E, xnue, ebulk3, xk,eg2, eg, elam,
-     1 eqplas,syield, ele, sigmaf,sigmae,h, def, defi
-     2 
+      DOUBLE PRECISION E, xnue, ebulk3, xk, eg2, eg, elam,
+     1 syield, ele, sigmaf,sigmae,h, def, defi
+      
       INTEGER k1, k2, i,kewton, k, kflag, j, prev
       
       DOUBLE PRECISION a1, a2, a3, a4, b1, b2, b3, b4, djacb, etat,
      1 rhs, dabs, deqpl, ep, q, r, ene,
      2 xm ,b,gnd, ssd,td
       
+c     state variables array for all integration points
+      DOUBLE PRECISION SVAR(4,nstatv), SVARtmp(nstatv)
       DOUBLE PRECISION tmp,lamme
 c
-c *** Obtaining plastic strains from previous iteration
-      eqplas=statev(1+2*ntens+2)
-c      eplas =epsPl
-      call get_ElmData ('EPTO', noel, npt, 4, eelas)
-      call get_ElmData ('EPPL', noel, npt, 4, eplas)
+c     obtain the gradient values from all integration points
+      SVAR=0.d0
+      do i=1,4
+         call get_ElmData ('SVAR', noel,i, nstatv, SVARtmp)
+          do j=1,nstatv
+              SVAR(i,j)=SVARtmp(j)
+         enddo
+      enddo
       call get_ElmData ('SIG', noel,npt, 3, sigi)
-       do i=1,4
-          eelas(i) = eelas(i) - eplas (i)
-       enddo 
-c   
+c     elastic strains
+      eelas=stran - epsPl
+      
+c *** Material properties  
+c     Young modulus
       E=props(1)
+c     Poisson ratio
       xnue=props(2)
+c     Yeld stress
+      syield=props(3)
+c     characteristic length
+      ele=props(4)
+c     strain hardening exponent (0 < ene < 1)
+      ene=props(5)
+c     flag, statistically conserved dislocations. See Arsenlis and Parks (1998)
+c     in most cases is eq to 1      
+       kflag=props(6)
 c      
 c     it's needed for calculation of hourglass stiffness,
 c     tsstif have no analog in ABAQUS
       eg2=E/(1.d0+xnue)
       eg=eg2/2.d0
+c     it's needed for calculation of hourglass stiffness
       tsstif(1)=eg
       lamme=2*xnue*eg/(1-2*xnue)
-c
       elam=E/(1.d0-xnue*xnue)
+c      
+c     elastic stiffness matrix
       ddsdde=0.d0 
       ddsdde(1,1)=elam
       ddsdde(1,2)=elam*xnue
@@ -97,17 +114,16 @@ c
       ebulk3=E/(1.d0-2.d0*xnue)
       xk=ebulk3/3.d0 
    
-c     Rewrite  
+c     
       if (all(dstran .eq. 0)) then
-          if (npt.eq.1) then
-              strainp=0.d0    
-              eqgrad=0.d0
-          end if
-c
+c     In first iteration we need only elastic stiffness matrix
+          continue
       else
 c     integration point coordinates in the isoparametric space
         if (npt.eq.1) then
+c     Start integration point loop
         do k1=1,4
+c     Integration point coordinates in the isoparametric space   
          if (k1==1) then
           s=-0.577350269189626
           t=-0.577350269189626
@@ -128,26 +144,23 @@ c     adopted linear shape functions
          deriv(1,2)=-0.083333333333333401314*t+0.1443375672974065
          deriv(2,2)=-0.083333333333333401314*s-0.1443375672974065
          
-         
          deriv(1,3)=0.083333333333333401314*t+0.1443375672974065
          deriv(2,3)=0.083333333333333401314*s+0.1443375672974065
-         
-         
+                 
          deriv(1,4)=-0.083333333333333401314*t-0.1443375672974065
          deriv(2,4)=-0.083333333333333401314*s+0.1443375672974065
-
-         
-         xjacm(1,1)= deriv(1,1)*cordex(noel,1)+deriv(1,2)*cordex(noel,2)
-     1 +deriv(1,3)*cordex(noel,3)+deriv(1,4)*cordex(noel,4)
+   
+         xjacm(1,1)= deriv(1,1)*SVAR(1,1)+deriv(1,2)*SVAR(2,1)
+     1 +deriv(1,3)*SVAR(3,1)+deriv(1,4)*SVAR(4,1)
     
-         xjacm(1,2)= deriv(1,1)*cordey(noel,1)+deriv(1,2)*cordey(noel,2)
-     1 +deriv(1,3)*cordey(noel,3)+deriv(1,4)*cordey(noel,4)
+         xjacm(1,2)= deriv(1,1)*SVAR(1,2)+deriv(1,2)*SVAR(2,2)
+     1 +deriv(1,3)*SVAR(3,2)+deriv(1,4)*SVAR(4,2) 
      
-         xjacm(2,1)= deriv(2,1)*cordex(noel,1)+deriv(2,2)*cordex(noel,2)
-     1 +deriv(2,3)*cordex(noel,3)+deriv(2,4)*cordex(noel,4)
+         xjacm(2,1)= deriv(2,1)*SVAR(1,1)+deriv(2,2)*SVAR(2,1)
+     1 +deriv(2,3)*SVAR(3,1)+deriv(2,4)*SVAR(4,1)
       
-         xjacm(2,2)= deriv(2,1)*cordey(noel,1)+deriv(2,2)*cordey(noel,2)
-     1 +deriv(2,3)*cordey(noel,3)+deriv(2,4)*cordey(noel,4)
+         xjacm(2,2)= deriv(2,1)*SVAR(1,2)+deriv(2,2)*SVAR(2,2)
+     1 +deriv(2,3)*SVAR(3,2)+deriv(2,4)*SVAR(4,2) 
 
          djacb=xjacm(1,1)*xjacm(2,2)-xjacm(1,2)*xjacm(2,1) 
       
@@ -165,58 +178,68 @@ c     adopted linear shape functions
          b3=xjaci(2,1)*deriv(1,3)+xjaci(2,2)*deriv(2,3) 
          b4=xjaci(2,1)*deriv(1,4)+xjaci(2,2)*deriv(2,4) 
          !dn111
-         eta(1)=a1*strainp(noel,1)+a2*strainp(noel,5)+a3*strainp(noel,9)
-     1 +a4*strainp(noel,13)
+         eta(1)=a1*SVAR(1,4) + a2*SVAR(2,4) + a3*SVAR(3,4)
+     1        + a4*SVAR(4,4)
          !dn112
-         eta(2)=2.d0*(a1*strainp(noel,4)+a2*strainp(noel,8)
-     1 +a3*strainp(noel,12)+a4*strainp(noel,16))
-     2 -b1*strainp(noel,1)-b2*strainp(noel,5) 
-     3 -b3*strainp(noel,9)-b4*strainp(noel,13)
+         eta(2)=2.d0*(a1*SVAR(1,7)+a2*SVAR(2,7)
+     1    + a3*SVAR(3,7) + a4*SVAR(4,7))
+     2    - b1*SVAR(1,4) - b2*SVAR(2,4) 
+     3    - b3*SVAR(3,4) - b4*SVAR(4,4)
          !dn121
-         eta(3)=b1*strainp(noel,1)+b2*strainp(noel,5)+b3*strainp(noel,9)
-     1 +b4*strainp(noel,13)
+         eta(3)=b1*SVAR(1,4) + b2*SVAR(2,4) + b3*SVAR(3,4)
+     1    + b4*SVAR(4,4)
          !dn122    
-        eta(4)=a1*strainp(noel,2)+a2*strainp(noel,6)+a3*strainp(noel,10)
-     1 +a4*strainp(noel,14)
+        eta(4)=a1*SVAR(1,5) + a2*SVAR(2,5) + a3*SVAR(3,5)
+     1    + a4*SVAR(4,5)
         !dn133   
-        eta(5)=a1*strainp(noel,3)+a2*strainp(noel,7)+a3*strainp(noel,11)
-     1 +a4*strainp(noel,15)
+        eta(5)=a1*SVAR(1,8) + a2*SVAR(2,8)
+     &    + a3*SVAR(3,8) + a4*SVAR(4,8)
         !dn211 
-         eta(6)=b1*strainp(noel,1)+b2*strainp(noel,5)+b3*strainp(noel,9)
-     1 +b4*strainp(noel,13)
+         eta(6)=b1*SVAR(1,4) + b2*SVAR(2,4) + b3*SVAR(3,4)
+     1    + b4*SVAR(4,4)
         !dn212
-        eta(7)=a1*strainp(noel,2)+a2*strainp(noel,6)+a3*strainp(noel,10)
-     1 +a4*strainp(noel,14)
+        eta(7)=a1*SVAR(1,5) + a2*SVAR(2,5) + a3*SVAR(3,5)
+     &    + a4*SVAR(4,5)
         !dn221  
-        eta(8)=2.d0*(b1*strainp(noel,4)+b2*strainp(noel,8)
-     1 +b3*strainp(noel,12)+b4*strainp(noel,16))
-     2 -a1*strainp(noel,2)-a2*strainp(noel,6)
-     3 -a3*strainp(noel,10)-a4*strainp(noel,14)
+        eta(8)=2.d0*(b1*SVAR(1,7) + b2*SVAR(2,7) + b3*SVAR(3,7)
+     &    + b4*SVAR(4,7)) 
+     &    - a1*SVAR(1,5) - a2*SVAR(2,5) - a3*SVAR(3,5)
+     &    - a4*SVAR(4,5) 
         !dn222  
-        eta(9)=b1*strainp(noel,2)+b2*strainp(noel,6)+b3*strainp(noel,10)
-     1 +b4*strainp(noel,14)
+        eta(9)=b1*SVAR(1,5) + b2*SVAR(2,5) + b3*SVAR(3,5)
+     1    + b4*SVAR(4,5)
         !dn233
-         eta(10)=b1*strainp(noel,3)+b2*strainp(noel,7) 
-     1 +b3*strainp(noel,11)+b4*strainp(noel,15)
+         eta(10)=b1*SVAR(1,6) + b2*SVAR(2,6) + b3*SVAR(3,6)
+     1    + b4*SVAR(4,6)
         !dn313
-         eta(11)=a1*strainp(noel,3)+a2*strainp(noel,7) 
-     1 +a3*strainp(noel,11)+a4*strainp(noel,15)
+         eta(11)=a1*SVAR(1,6) + a2*SVAR(2,6)
+     &    + a3*SVAR(3,6) + a4*SVAR(4,6)
         !dn323
-         eta(12)=b1*strainp(noel,3) + b2*strainp(noel,7)
-     1 +b3*strainp(noel,11)+b4*strainp(noel,15)
+         eta(12)= - b1*SVAR(1,6) - b2*SVAR(2,6) 
+     &    - b3*SVAR(3,6) - b4*SVAR(4,6)
         !dn331
-         eta(13)=-(a1*strainp(noel,3)+a2*strainp(noel,7) 
-     1 +a3*strainp(noel,11)+a4*strainp(noel,15))
+         eta(13)=
+     &    - a1*SVAR(1,6) - a2*SVAR(2,6) - a3*SVAR(3,6)
+     &    - a4*SVAR(4,6) 
         !dn332 
-         eta(14)=-(b1*strainp(noel,3)+b2*strainp(noel,7)
-     1 +b3*strainp(noel,11)+b4*strainp(noel,15))
+         eta(14)=- b1*SVAR(1,6) - b2*SVAR(2,6) 
+     &    - b3*SVAR(3,6) - b4*SVAR(4,6)
 
         etat=eta(1)**2+eta(2)**2+eta(3)**2+eta(4)**2+eta(5)**2+eta(6)**2
      1 +eta(7)**2+eta(8)**2+eta(9)**2+eta(10)**2+eta(11)**2+eta(12)**2
      2 +eta(13)**2+eta(14)**2
-
-         eqgrad(noel,k1)=eqgrad(noel,k1)+sqrt((1.d0/4.d0)*(etat))
+         
+        SVAR(k1,10) = SVAR(k1,10) + sqrt((1.d0/4.d0)*(etat))
+!         eqgrad(noel,k1)=eqgrad(noel,k1)+sqrt((1.d0/4.d0)*(etat))
         enddo
+c     Save obtained gradients
+          do k1=1,4
+            do k2=1,nstatv
+              SVARtmp(k2)=SVAR(k1,k2)
+            enddo
+           call put_ElmData ('SVAR', noel, k1, nstatv, SVARtmp)
+          enddo
+          
        endif          
 c              
        xiden=0.d0
@@ -272,12 +295,10 @@ c     Effective strains increment
        defi=sqrt(2.d0/3.d0*defi)
 
 c *** Plastic
-       syield=props(3)
-       ele=props(4)
-       ene=props(5)
+
 c     flow stress
-      sigmaf=syield*((E/syield)**ene)*sqrt((eqplas+(syield/E))**(2*ene)
-     1 + ele*eqgrad(noel,npt))
+      sigmaf=syield*((E/syield)**ene)*sqrt((epseq+(syield/E))**(2*ene)
+     1 + ele*SVAR(npt,10))
      
 c          
        !eg=E/3
@@ -295,7 +316,7 @@ c
    20 continue
 
        deqpl=def-sigmae/(3.d0*eg) !3.15 
-       eqplas=eqplas+deqpl
+       epseq=epseq+deqpl
        
        
        dstr=strain*2.d0*eg/(1.d0+deqpl*3.d0*eg/sigmae) !3.10 
@@ -319,28 +340,19 @@ c
        destran(3)=dstra(3,3)-dpstran(3)
        destran(4)=dstran(3)-dpstran(4)
        
-       eplas=eplas+dpstran
+       epsPl=epsPl+dpstran
        eelas=eelas+destran
        ep=(eelas(1)+eelas(2)+eelas(3))
        
-       stran(1)=eelas(1)+eplas(1)
-       stran(2)=eelas(2)+eplas(2)
-       stran(3)=eelas(4)+eplas(4)
+       stran(1)=eelas(1)+epsPl(1)
+       stran(2)=eelas(2)+epsPl(2)
+       stran(3)=eelas(4)+epsPl(4)
 
        do j=1,3
         stress(j)=dstre(j)+xk*ep
        enddo
        stress(3)=dstre(4)
 
-       if (npt==1) then
-        strainp(noel,1:4)=dpstran
-       elseif (npt==2) then
-        strainp(noel,5:8)=dpstran 
-       elseif (npt==3) then
-        strainp(noel,9:12)=dpstran
-       elseif (npt==4) then  
-        strainp(noel,13:16)=dpstran      
-      end if
 c     Svar (1-4)
        statev(1:4)=eelas  
 c     Svar (5-8)
@@ -368,7 +380,7 @@ c
        end do
        ddsdde(3,3) = q/2.d0 - r*dstre(4)*dstre(4) 
        
-       kflag=props(6)
+
        if (kflag.eq.1) then ! fcc
         xm=3.06d0
         b=0.2555d-6
@@ -382,29 +394,26 @@ c
        if (ele.eq.0.d0) then
         gnd=0.d0
        else
-        gnd=r*eqgrad(noel,npt)/b
+        gnd=r*SVAR(npt,10)/b
        endif    
-       ssd=((syield*(E/syield)**ene*(eqplas+syield/E)**ene)/
+       ssd=((syield*(E/syield)**ene*(epseq+syield/E)**ene)/
      & (xm*0.5*eg*b))**2
        td=gnd+ssd
-       statev(1+2*ntens+2)=eqplas                   !    Svar (9)
-       epseq=eqplas
+c *** Save user variable array     
+c     gradient 
+       statev(10)= SVAR(npt,10)    
+c     to plot ssd in m^-2 
+       statev(11)=(1000000.0d0)*ssd
+c     to plot gnd in m^-2 
+       statev(12)=(1000.0d0)*gnd
+c     total dislocations
+       statev(13)=td 
        
-       statev(2+2*ntens+2)=eqgrad(noel,npt)         !    Svar (10) 
-       
-       statev(3+2*ntens+2)=(1000000.0d0)*ssd 
-       ! to plot in m^-2 Svar (11)
-       
-       statev(4+2*ntens+2)=(1000.0d0)*gnd    
-       ! to plot in m^-2 Svar (12)
-       
-       statev(7+2*ntens+2)=td-statev(5+2*ntens)     !    Svar (15)
-       statev(5+2*ntens+2)=td                       !    Svar (13)
-       statev(6+2*ntens+2)=deqpl                    !    Svar (14)
       end if
-
-      cordex(noel,npt)=coords(1)
-      cordey(noel,npt)=coords(2)    
+c      
+      statev(1)=coords(1)
+      statev(2)=coords(2)
+      statev(3)=coords(3)
       
       return
       end

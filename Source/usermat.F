@@ -23,12 +23,6 @@ c             Crack tip fields and fracture resistance parameters based on strai
 c             International Journal of Solids and Structures, Volumes 208–209, 2021, Pages 63-82      
 c         https://doi.org/10.1016/j.ijsolstr.2020.10.015
 c
-c         Also more information can be found in
-c             V. Shlyannikov, E. Martinez-Paneda, A. Tumanov, R. Khamidullin,
-c             Mode I and mode II stress intensity factors and dislocation density behaviour in strain gradient plasticity,
-c             Theoretical and Applied Fracture Mechanics, Volume 116, 2021, 103128 
-c         https://doi.org/10.1016/j.tafmec.2021.103128
-c
 c      Attention:
 c           User must define material constitutive law properly
 c           according to the stress state such as 3D, plane strain
