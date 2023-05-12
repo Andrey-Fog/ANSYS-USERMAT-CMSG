@@ -50,7 +50,8 @@ On the tab, click on the button:
 
 **2. In the variable value field, specify the path to the folder where library is located. Use only latin characters in the path.**
 
-*For example: C:\Username\......\Usermatlib*
+*For example:* 
+>C:\Username\......\Usermatlib
    
 If everything is connected correctly in the ANSYS output window at startup there will be a line 
 
@@ -81,6 +82,27 @@ And add cells. There should be 6 properties in total. Of which:
 |  C5 |  -  |Strain hardening exponent (0 < N < 1)  |
 |  C6 |  -  |flag, 0 or 1. [Usually](https://doi.org/10.1016/S1359-6454(99)00020-8) 1 for metals|
 
+In command line it will be looks like present bellow
+
+>!* Define parameters related to CMSG model  
+>!* Modulus of Elasticity  
+>Young	= 200000   
+>!* Poisson ratio  
+>nu	= 0.3  
+>!* Yield Strength  
+>S02	= 300  
+>!* Length parameter in the CMSG model (approximate order 1e-6 meters)  
+>Leng 	= 1E-6  
+>!* Strain hardering exponent (0 < N < 1)  
+>SHE	= 0.15  
+>!* Flag  0 or 1. Usually 1 for metals  
+>Flag 	= 1
+>     
+>!* add user model  
+>TB,USER,1,1,6,  
+>TBTEMP,0  
+>TBDATA,,Young,nu,S02,Leng,SHE,Flag  
+
 **5. Add 13 state variables**  
 
 *Preprocessor->Material Props->Material models->Structural->Specialized Materials->User material options->State Variables*
@@ -94,20 +116,30 @@ And add cells. There should be 6 properties in total. Of which:
 |  12 | Geometrically necessary dislocations  |
 |  13 | Total density of dislocations         |
 
-That's all. Further we work as with the usual scheme.
+APDL script for preprocessor section
+
+>TB,STAT,1,1,13,  
+>TBTEMP,0  
+>TBDATA,,0,0,0,0,0,0  
+>TBDATA,,0,0,0,0,0,0  
+>TBDATA,,0  
 
 **6. Access to user arrays**
 
 Before starting on the solution in the solver (/SOL) in the command line of ANSYS, write the line:
 
-- to save every substeps results
-| OUTRES,SVAR,ALL    |
+- to save every substeps results  
+> OUTRES,SVAR,ALL
 
-- to save only the last step
-| OUTRES,SVAR,LAST   |
+- to save only the last step  
+> OUTRES,SVAR,LAST
 
-In order for all elements of user arrays to be available, command
-//GRA,FULL must be used in the postprocessor after the calculation.
+In order for all elements of user arrays to be available, command GRAF must be used in the postprocessor (/POST) section.  
+
+> /GRA,FULL
+
+That's all. Further we work as with the usual scheme.
+
 <br>
 <br>
 <br>
