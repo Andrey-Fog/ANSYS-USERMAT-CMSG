@@ -16,7 +16,6 @@ c     The procedure is created for SOLID186 element with Keyopt(2)=0.
 c     SOLID186 have a 8 integration points. 
 c     Coordinates of integration points in the coordinate system s-t-r = ± 0.577350269189626
 !DEC$ ATTRIBUTES DLLEXPORT, ALIAS:"USERMAT3D"::usermat3d 
-      use kplastic
 c
 #include "impcom.inc"
 c
