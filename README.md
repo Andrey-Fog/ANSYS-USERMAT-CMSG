@@ -7,9 +7,11 @@ The conventional theory of mechanism-based strain gradient plasticity is realize
 
 
  ## Research results  
- - [Crack tip fields and fracture resistance parameters based on strain gradient plasticity](https://doi.org/10.1016/j.ijsolstr.2020.10.015)  
+- [Crack tip fields and fracture resistance parameters based on strain gradient plasticity](https://doi.org/10.1016/j.ijsolstr.2020.10.015)  
 
 - [Mode I and mode II stress intensity factors and dislocation density behaviour in strain gradient plasticity](https://doi.org/10.1016/j.tafmec.2021.103128)
+
+- [Inversion of dislocation densities under mixed mode fracture](https://doi.org/10.1016/j.engfailanal.2022.106311)
 
 ## Acknowledgment
 I want to say thank a lot to ​​​[​Emilio Martínez Pañeda](https://www.empaneda.com/) for the detailed presentation of his methods in open acsess and active assistance. This helped a lot in the implementation of CMSG theory into ANSYS. This project is reworked his ABAQUS subroutine presented [here](https://doi.org/10.1016/j.ijsolstr.2015.02.010). 
@@ -75,7 +77,7 @@ And add cells. There should be 6 properties in total. Of which:
 |  C1 |  -  |Young modulus                          |
 |  C2 |  -  |Puasson ratio                          |
 |  C3 |  -  |Yelding stress                         | 
-|  C4 |  -  |Characteristic length                  |  
+|  C4 |  -  |Intrinsic material length              |  
 |  C5 |  -  |Strain hardening exponent (0 < N < 1)  |
 |  C6 |  -  |flag, 0 or 1. [Usually](https://doi.org/10.1016/S1359-6454(99)00020-8) 1 for metals|
 
@@ -88,12 +90,24 @@ And add cells. There should be 6 properties in total. Of which:
 | 1-3 | Coordinates of integration points     |
 | 4-9 | Derivatives x,y,z,xy,yz,zx            |
 |  10 | Gradient value                        |
-|  11 | Statically necessary dislocations     |
+|  11 | Statistically necessary dislocations  |
 |  12 | Geometrically necessary dislocations  |
 |  13 | Total density of dislocations         |
 
 That's all. Further we work as with the usual scheme.
 
+**6. Access to user arrays**
+
+Before starting on the solution in the solver (/SOL) in the command line of ANSYS, write the line:
+
+- to save every substeps results
+| OUTRES,SVAR,ALL    |
+
+- to save only the last step
+| OUTRES,SVAR,LAST   |
+
+In order for all elements of user arrays to be available, command
+//GRA,FULL must be used in the postprocessor after the calculation.
 <br>
 <br>
 <br>
