@@ -125,7 +125,7 @@ APDL script for preprocessor section
 >TBDATA,,0,0,0,0,0,0  
 >TBDATA,,0  
 
-**6. Access to user arrays**
+**6. Access to user variable arrays**
 
 Before starting on the solution in the solver (/SOL) in the command line of ANSYS, write the line:
 
