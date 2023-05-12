@@ -179,8 +179,8 @@ c     adopted linear shape functions
         eta(4)=a1*SVAR(1,5) + a2*SVAR(2,5) + a3*SVAR(3,5)
      1    + a4*SVAR(4,5)
         !dn133   
-        eta(5)=a1*SVAR(1,8) + a2*SVAR(2,8)
-     &    + a3*SVAR(3,8) + a4*SVAR(4,8)
+        eta(5)=a1*SVAR(1,6) + a2*SVAR(2,6)
+     &    + a3*SVAR(3,6) + a4*SVAR(4,6)
         !dn211 
          eta(6)=b1*SVAR(1,4) + b2*SVAR(2,4) + b3*SVAR(3,4)
      1    + b4*SVAR(4,4)
