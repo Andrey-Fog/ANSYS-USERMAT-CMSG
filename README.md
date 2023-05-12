@@ -7,7 +7,7 @@ If you using this code for research or industrial purposes please cite one of th
 
 
 
- ## Research results  
+ ## Research results and theory  
 - [Crack tip fields and fracture resistance parameters based on strain gradient plasticity](https://doi.org/10.1016/j.ijsolstr.2020.10.015)  
 
 - [Mode I and mode II stress intensity factors and dislocation density behaviour in strain gradient plasticity](https://doi.org/10.1016/j.tafmec.2021.103128)
@@ -15,7 +15,7 @@ If you using this code for research or industrial purposes please cite one of th
 - [Inversion of dislocation densities under mixed mode fracture](https://doi.org/10.1016/j.engfailanal.2022.106311)
 
 ## Acknowledgment
-I want to say thank a lot to ​​​[​Emilio Martínez Pañeda](https://www.empaneda.com/) for the detailed presentation of his methods in open acsess and active assistance. This helped a lot in the implementation of CMSG theory into ANSYS. This project is reworked his ABAQUS subroutine presented [here](https://doi.org/10.1016/j.ijsolstr.2015.02.010). 
+I want to say thank a lot to ​​​[​Emilio Martínez Pañeda](https://www.empaneda.com/) for the detailed presentation of his methods in open acsess and active assistance. This helped a lot in the implementation of CMSG theory into ANSYS. This project is reworked ABAQUS subroutine described [here](https://doi.org/10.1016/j.ijsolstr.2015.02.010). 
 
 
 <br>
