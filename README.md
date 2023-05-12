@@ -11,6 +11,8 @@ The conventional theory of mechanism-based strain gradient plasticity is realize
 
 - [Mode I and mode II stress intensity factors and dislocation density behaviour in strain gradient plasticity](https://doi.org/10.1016/j.tafmec.2021.103128)
 
+- [Inversion of dislocation densities under mixed mode fracture](https://doi.org/10.1016/j.engfailanal.2022.106311)
+
 ## Acknowledgment
 I want to say thank a lot to ​​​[​Emilio Martínez Pañeda](https://www.empaneda.com/) for the detailed presentation of his methods in open acsess and active assistance. This helped a lot in the implementation of CMSG theory into ANSYS. This project is reworked his ABAQUS subroutine presented [here](https://doi.org/10.1016/j.ijsolstr.2015.02.010). 
 
@@ -99,15 +101,13 @@ That's all. Further we work as with the usual scheme.
 Before starting on the solution in the solver (/SOL) in the command line of ANSYS, write the line:
 
 - to save every substeps results
-| OUTRES,ALL,ALL     |
 | OUTRES,SVAR,ALL    |
 
 - to save only the last step
-| OUTRES,ALL,LAST    |
 | OUTRES,SVAR,LAST   |
 
-In order for all elements of user arrays to be available,
-//GRA,FULL command must be used in the postprocessor after the calculation
+In order for all elements of user arrays to be available, command
+//GRA,FULL must be used in the postprocessor after the calculation.
 <br>
 <br>
 <br>
