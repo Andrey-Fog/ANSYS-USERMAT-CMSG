@@ -1,10 +1,18 @@
 # ANSYS-USERMAT-CMSG
-The conventional theory of mechanism-based strain gradient plasticity is realized via ANSYS user programmable features for USERMAT subroutine. 
+The conventional theory of mechanism-based strain gradient plasticity is realized via ANSYS user programmable features for USERMAT subroutine.   
+Strain gradient plasticity is a theory of continuum solid mechanics which aims at modeling the irreversible mechanical behavior of materials, with specific focus on metals and on their response at appropriately small size, typically on the order of micrometers or less. For small scale, a variation in size leads to a peculiar effect, denoted as “smaller being stronger.” At the crack tip, taking into account gradient plasticity leads to a significant increase of stresses.
+
+<center>
+
+<img src="Images\Crack tip stress.png" width="600" alt="Crack tip stress"> 
+
+</center>
+
+<br>
 
  In source files you can find a APDL script example for 2D cracked body. After compiling and attaching present dynamic link library as ANSYS user material copy and run [this file](https://github.com/Andrey-Fog/ANSYS-USERMAT-CMSG/blob/main/Source/APDL-%202D%20crack%20example.txt) from ANSYS Mechanical command line.
 
-
-
+<br>
 
  ## Research results  
 - [Crack tip fields and fracture resistance parameters based on strain gradient plasticity](https://doi.org/10.1016/j.ijsolstr.2020.10.015)  
