@@ -308,43 +308,43 @@ c     lines are s t r
      2 +deriv(1,5)*SVAR(5,1)+deriv(1,6)*SVAR(6,1) 
      3 +deriv(1,7)*SVAR(7,1)+deriv(1,8)*SVAR(8,1) 
          
-           xjacm(1,2)= deriv(2,1)*SVAR(1,1)+deriv(2,2)*SVAR(2,1)
-     1 +deriv(2,3)*SVAR(3,1)+deriv(2,4)*SVAR(4,1) 
-     2 +deriv(2,5)*SVAR(5,1)+deriv(2,6)*SVAR(6,1) 
-     3 +deriv(2,7)*SVAR(7,1)+deriv(2,8)*SVAR(8,1) 
+         xjacm(1,2)= deriv(1,1)*SVAR(1,2)+deriv(1,2)*SVAR(2,2)
+     1 +deriv(1,3)*SVAR(3,2)+deriv(1,4)*SVAR(4,2) 
+     2 +deriv(1,5)*SVAR(5,2)+deriv(1,6)*SVAR(6,2) 
+     3 +deriv(1,7)*SVAR(7,2)+deriv(1,8)*SVAR(8,2)
            
-           xjacm(1,3)= deriv(3,1)*SVAR(1,1)+deriv(3,2)*SVAR(2,1)
+         xjacm(1,3)= deriv(3,1)*SVAR(1,1)+deriv(3,2)*SVAR(2,1)
      1 +deriv(3,3)*SVAR(3,1)+deriv(3,4)*SVAR(4,1) 
      2 +deriv(3,5)*SVAR(5,1)+deriv(3,6)*SVAR(6,1) 
      3 +deriv(3,7)*SVAR(7,1)+deriv(3,8)*SVAR(8,1) 
            
-          xjacm(2,1)= deriv(1,1)*SVAR(1,2)+deriv(1,2)*SVAR(2,2)
-     1 +deriv(1,3)*SVAR(3,2)+deriv(1,4)*SVAR(4,2) 
-     2 +deriv(1,5)*SVAR(5,2)+deriv(1,6)*SVAR(6,2) 
-     3 +deriv(1,7)*SVAR(7,2)+deriv(1,8)*SVAR(8,2) 
-          
-          xjacm(2,2)= deriv(2,1)*SVAR(1,2)+deriv(2,2)*SVAR(2,2)
+         xjacm(2,1)= deriv(2,1)*SVAR(1,1)+deriv(2,2)*SVAR(2,1)
+     1 +deriv(2,3)*SVAR(3,1)+deriv(2,4)*SVAR(4,1) 
+     2 +deriv(2,5)*SVAR(5,1)+deriv(2,6)*SVAR(6,1) 
+     3 +deriv(2,7)*SVAR(7,1)+deriv(2,8)*SVAR(8,1) 
+           
+         xjacm(2,2)= deriv(2,1)*SVAR(1,2)+deriv(2,2)*SVAR(2,2)
      1 +deriv(2,3)*SVAR(3,2)+deriv(2,4)*SVAR(4,2) 
      2 +deriv(2,5)*SVAR(5,2)+deriv(2,6)*SVAR(6,2) 
      3 +deriv(2,7)*SVAR(7,2)+deriv(2,8)*SVAR(8,2) 
           
-          xjacm(2,3)= deriv(3,1)*SVAR(1,2)+deriv(3,2)*SVAR(2,2)
+         xjacm(2,3)= deriv(3,1)*SVAR(1,2)+deriv(3,2)*SVAR(2,2)
      1 +deriv(3,3)*SVAR(3,2)+deriv(3,4)*SVAR(4,2) 
      2 +deriv(3,5)*SVAR(5,2)+deriv(3,6)*SVAR(6,2) 
      3 +deriv(3,7)*SVAR(7,2)+deriv(3,8)*SVAR(8,2) 
           
           
-          xjacm(3,1)= deriv(1,1)*SVAR(1,3)+deriv(1,2)*SVAR(2,3)
+         xjacm(3,1)= deriv(1,1)*SVAR(1,3)+deriv(1,2)*SVAR(2,3)
      1 +deriv(1,3)*SVAR(3,3)+deriv(1,4)*SVAR(4,3) 
      2 +deriv(1,5)*SVAR(5,3)+deriv(1,6)*SVAR(6,3) 
      3 +deriv(1,7)*SVAR(7,3)+deriv(1,8)*SVAR(8,3) 
           
-          xjacm(3,2)= deriv(2,1)*SVAR(1,3)+deriv(2,2)*SVAR(2,3)
+         xjacm(3,2)= deriv(2,1)*SVAR(1,3)+deriv(2,2)*SVAR(2,3)
      1 +deriv(2,3)*SVAR(3,3)+deriv(2,4)*SVAR(4,3) 
      2 +deriv(2,5)*SVAR(5,3)+deriv(2,6)*SVAR(6,3) 
      3 +deriv(2,7)*SVAR(7,3)+deriv(2,8)*SVAR(8,3) 
           
-          xjacm(3,3)= deriv(3,1)*SVAR(1,3)+deriv(3,2)*SVAR(2,3)
+         xjacm(3,3)= deriv(3,1)*SVAR(1,3)+deriv(3,2)*SVAR(2,3)
      1 +deriv(3,3)*SVAR(3,3)+deriv(3,4)*SVAR(4,3) 
      2 +deriv(3,5)*SVAR(5,3)+deriv(3,6)*SVAR(6,3) 
      3 +deriv(3,7)*SVAR(7,3)+deriv(3,8)*SVAR(8,3) 
